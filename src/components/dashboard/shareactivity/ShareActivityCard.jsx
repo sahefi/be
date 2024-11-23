@@ -9,7 +9,7 @@ const ShareActivityCard = ({ activity }) => {
   };
 
   return (
-    <div className="p-5 bg-white shadow-sm rounded-2xl w-2/3 mb-5">
+    <div className="p-5 bg-white shadow-sm rounded-2xl w-full mb-5">
       {/* Header */}
       <div className="flex gap-5">
         <img
