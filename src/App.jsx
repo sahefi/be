@@ -24,13 +24,12 @@ import UpdateShareMeals from './components/dashboard/sharemeals/UpdateShareMeals
 
 
 import AdminDashboard from './pages/dashboard/admin/AdminDashboard';
-import ShareMealsVerif from './pages/dashboard/admin/ShareMealsVerif';
 import CampaignVerif from './pages/dashboard/admin/charitycampaign/CampaignVerif';
 import CampaignDetailVerif from './pages/dashboard/admin/charitycampaign/CampaignDetailVerif';
 import BlogArticleVerif from './pages/dashboard/admin/blogartikel/BlogArticleVerif';
 import ArticleVerifDetail from './pages/dashboard/admin/blogartikel/ArticleVerifDetail';
 import AccountDetailVerif from './components/dashboard/admin/AccountDetailVerif';
-
+import AccountList from './pages/dashboard/admin/AccountList';
 const App = () => {
   return (
     <div>
@@ -62,8 +61,8 @@ const App = () => {
           <Route path="/share-meals/update/:id" element={<UpdateShareMeals />} />
 
 
+          <Route path="/account-list" element={<AccountList />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/share-meals-verif" element={<ShareMealsVerif />} />
           <Route path="/campaign-verif" element={<CampaignVerif />} />
           <Route path="/campaign-detail-verif/:id" element={<CampaignDetailVerif />} />
           <Route path="/article-verif" element={<BlogArticleVerif />} />

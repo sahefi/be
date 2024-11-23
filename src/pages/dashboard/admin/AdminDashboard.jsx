@@ -151,7 +151,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Charity Transactions */}
-                <div className='w-full p-5 bg-white shadow-md rounded-xl'>
+                <div className='w-full p-5 bg-white  shadow-md rounded-xl'>
                   <div className='flex items-center justify-between mb-4'>
                     <h2 className='text-lg font-semibold'>Total Donasi Charity</h2>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#45c517" viewBox="0 0 16 16">
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
                           <td className='px-4 py-2'>{request.email}</td>
                           <td className='px-4 py-2'>{request.role}</td>
                           <td className='px-4 py-2'>
-                            <span className={`px-2 py-1 rounded-full text-white 
+                            <span className={`px-3 text-sm py-1 rounded-full text-white 
             ${request.status === 'pending' ? 'bg-yellow-500' :
                                 request.status === 'approved' ? 'bg-green-500' : 'bg-red-500'}`}>
                               {request.status}
@@ -211,7 +211,7 @@ const AdminDashboard = () => {
                           <td>
                             <button
                               onClick={() => handleDetailClick(request)}
-                              className='px-4 py-1 bg-[#45c517] text-white rounded-full hover:bg-[#3ba913]'
+                              className='px-5 text-sm py-1 bg-[#45c517] text-white rounded-full hover:bg-[#3ba913]'
                             >
                               Detail
                             </button>

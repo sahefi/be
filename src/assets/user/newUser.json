@@ -61,7 +61,7 @@
         "phone_number": "081567890123",
         "role": "Lembaga Sosial",
         "id": 4,
-        "status": "pending",
+        "status": "accepted",
         "nomor_rekening_perusahaan": "5432167890123456",
         "nama_pendiri": "Ahmad Yani",
         "surat_izin": "https://example.com/suratizin.jpg",
@@ -86,7 +86,7 @@
     },
     {
         "username": "lourmarin",
-        "image_url": "https://example.com/image5.jpg",
+        "image_url": "https://cdn-1.timesmedia.co.id/images/2024/10/28/Aesthetic-atmosphere.jpg",
         "name": "Lourmarin",
         "password": "lourmarin123",
         "location": "Malang, Indonesia",
@@ -100,5 +100,70 @@
         "nama_pendiri": "Jofan Sutampan",
         "surat_izin": "https://example.com/suratizin.jpg",
         "deskripsi": "Lourmarin adalah sebuah komunitas yang bergerak di bidang sosial, yang berdiri sejak tahun 2015. Komunitas ini beranggotakan para relawan yang memiliki kepedulian tinggi terhadap sesama. Lourmarin memiliki beberapa program unggulan, diantaranya adalah program pemberian bantuan makanan, program pemberian bantuan pakaian, program pemberian bantuan pendidikan, dan program pemberian bantuan kesehatan. Lourmarin memiliki visi untuk membantu masyarakat yang membutuhkan, serta memberikan kontribusi positif bagi masyarakat sekitar. Lourmarin memiliki misi untuk memberikan bantuan kepada masyarakat yang membutuhkan, serta memberikan edukasi kepada masyarakat sekitar tentang pentingnya kepedulian terhadap sesama. Lourmarin memiliki motto 'Bersama Kita Bisa Membantu' yang menjadi pedoman bagi setiap"
+    },
+    {
+        "username": "helpIndonesia7",
+        "image_url": "https://example.com/image7.jpg",
+        "name": "Bantuan Untuk Indonesia",
+        "password": "helpindonesia123",
+        "location": "Medan, Indonesia",
+        "address": "Jl. Balai Kota No. 7, Medan",
+        "email": "helpindonesia@example.id",
+        "phone_number": "081890123456",
+        "role": "user",
+        "id": 7,
+        "status": "accepted"
+    },
+    {
+        "username": "fedraghaffar",
+        "image_url": "https://example.com/image8.jpg",
+        "name": "Fedra Ghaffar",
+        "password": "fedra123",
+        "location": "Malang, Indonesia",
+        "address": "Jl. Pettarani No. 45, Malang",
+        "email": "fedra@example.id",
+        "phone_number": "081901234567",
+        "role": "user",
+        "id": 8,
+        "status": "accepted"
+    },
+    {
+        "username": "irzadzulhika",
+        "image_url": "https://example.com/image9.jpg",
+        "name": "Irza Dzulhika",
+        "password": "irzadzulhika",
+        "location": "Malang, Indonesia",
+        "address": "Jl. Pandanaran No. 10, Malang",
+        "email": "irza@example.id",
+        "phone_number": "081912345678",
+        "role": "user",
+        "id": 9,
+        "status": "accepted"
+    },
+    {
+        "username": "wijdanazhar",
+        "image_url": "https://example.com/image10.jpg",
+        "name": "Wijdan Azhar",
+        "password": "wijdan123",
+        "location": "Denpasar, Indonesia",
+        "address": "Jl. Sunset Road No. 88, Denpasar",
+        "email": "wijdan@example.id",
+        "phone_number": "081923456789",
+        "role": "user",
+        "id": 10,
+        "status": "accepted"
+    },
+    {
+        "username": "rotiboy123",
+        "image_url": "https://example.com/image10.jpg",
+        "name": "Roti Boy Malang",
+        "password": "rotiboy123",
+        "location": "Malang, Indonesia",
+        "address": "Jl. Sunset Road No. 88, Malang",
+        "email": "rotiboy@example.id",
+        "phone_number": "081923456789",
+        "role": "user",
+        "id": 11,
+        "status": "accepted"
     }
 ]

@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import Sidebar from '../Sidebar';
 import Navbar from '../../dashboard/Navbar';
-import charityData from '../../../assets/lembagasosial/lembagaSosialData.json';
+import charityData from '../../../assets/charitycampaign/lembagaSosialData.json';
 import { useNavigate } from 'react-router-dom';
 
 const formatPrice = (price) => `Rp ${Number(price).toLocaleString('id-ID')}`;

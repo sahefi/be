@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { motion } from "framer-motion"; // Import motion
 import SidebarAdmin from "../../../../components/dashboard/admin/SidebarAdmin";
 import NavbarAdmin from "../../../../components/dashboard/admin/NavbarAdmin";
-import lembagaSosialData from "../../../../assets/lembagasosial/lembagaSosialData.json";
+import lembagaSosialData from "../../../../assets/charitycampaign/lembagaSosialData.json";
 import { useNavigate } from "react-router-dom";
 
 const CampaignVerif = () => {
@@ -12,16 +13,21 @@ const CampaignVerif = () => {
     navigate(`/campaign-detail-verif/${campaign.id}`, {
       state: {
         status: activeTab,
-        showButtons: activeTab !== "Rejected"
-      }
+        showButtons: activeTab !== "Rejected",
+      },
     });
   };
-
 
   const campaigns = {
     Draft: [lembagaSosialData[0]],
     Accepted: [lembagaSosialData[1]],
     Rejected: [lembagaSosialData[2]],
+  };
+
+  const tabVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: 20 },
   };
 
   return (
@@ -34,65 +40,62 @@ const CampaignVerif = () => {
           <h1 className="mt-5 mx-10 text-2xl text-[#45c517] font-bold">
             Verifikasi Charity
           </h1>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="50"
-            height="50"
-            fill="currentColor"
-            className="text-green-500 hover:cursor-pointer mx-10 bi bi-arrow-left-short"
-            viewBox="0 0 16 16"
-            onClick={() => window.history.back()}
+
+          <motion.section
+            className="min-h-screen mx-10 my-5 p-5 rounded-xl bg-white shadow-md"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
           >
-            <path
-              fillRule="evenodd"
-              d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
-            />
-          </svg>
-          <section className="min-h-screen mx-10 my-5 p-5 rounded-md bg-white shadow-md">
             {/* Tabs */}
             <div className="font-semibold flex gap-7">
-              <p
-                className={`cursor-pointer ${activeTab === "Draft"
-                  ? "border-b-[2px] border-[#45c517] text-[#45c517]"
-                  : "text-gray-500"
+              {["Draft", "Accepted", "Rejected"].map((tab) => (
+                <motion.p
+                  key={tab}
+                  className={`cursor-pointer ${
+                    activeTab === tab
+                      ? "border-b-[2px] border-[#45c517] text-[#45c517]"
+                      : "text-gray-500"
                   }`}
-                onClick={() => setActiveTab("Draft")}
-              >
-                Draft
-              </p>
-              <p
-                className={`cursor-pointer ${activeTab === "Accepted"
-                  ? "border-b-[2px] border-[#45c517] text-[#45c517]"
-                  : "text-gray-500"
-                  }`}
-                onClick={() => setActiveTab("Accepted")}
-              >
-                Accepted
-              </p>
-              <p
-                className={`cursor-pointer ${activeTab === "Rejected"
-                  ? "border-b-[2px] border-[#45c517] text-[#45c517]"
-                  : "text-gray-500"
-                  }`}
-                onClick={() => setActiveTab("Rejected")}
-              >
-                Rejected
-              </p>
+                  onClick={() => setActiveTab(tab)}
+                  variants={tabVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 0.2 }}
+                >
+                  {tab}
+                </motion.p>
+              ))}
             </div>
+
             {/* Table */}
-            <div className="p-4">
+            <motion.div
+              className="p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
               <table className="table-fixed w-full border-collapse">
                 <thead>
                   <tr className="text-left">
                     <th className="px-4 py-2 font-semibold w-2/6">Username</th>
                     <th className="px-4 py-2 font-semibold w-1/12">ID</th>
                     <th className="px-4 py-2 font-semibold w-1/6">Kategori</th>
-                    <th className="px-4 py-2 font-semibold w-1/4">Judul Charity</th>
+                    <th className="px-4 py-2 font-semibold w-1/4">
+                      Judul Charity
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <motion.tbody>
                   {campaigns[activeTab].map((campaign, index) => (
-                    <tr key={index}>
+                    <motion.tr
+                      key={index}
+                      className="hover:bg-gray-100 border-b"
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.1 }}
+                    >
                       <td className="px-4 py-2 flex items-center gap-3">
                         <img
                           src={campaign.image_url}
@@ -104,27 +107,30 @@ const CampaignVerif = () => {
                       <td className="px-4 py-2">{campaign.id}</td>
                       <td className="px-4 py-2">{campaign.category}</td>
                       <td className="px-4 py-2">
-                        <span className="block truncate">{campaign.campaign_title}</span>
+                        <span className="block truncate">
+                          {campaign.campaign_title}
+                        </span>
                       </td>
                       <td className="px-4 py-2 text-right">
                         {activeTab !== "Rejected" ? (
-                          <button
+                          <motion.button
                             onClick={() => handleDetailClick(campaign)}
                             className="bg-[#45c517] text-white w-32 py-2 rounded-full hover:opacity-90 text-sm font-medium"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                           >
                             Lihat Detail
-                          </button>
+                          </motion.button>
                         ) : (
                           <span className="text-gray-500">Rejected</span>
                         )}
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
-                </tbody>
+                </motion.tbody>
               </table>
-
-            </div>
-          </section>
+            </motion.div>
+          </motion.section>
         </div>
       </section>
     </div>

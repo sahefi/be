@@ -3,16 +3,24 @@ import { Link } from "react-router-dom";
 
 const CardShareMeals = ({ product }) => {
   return (
-    <div className='hover:cursor-pointer w-52 pb-3 bg-white shadow-md rounded-xl p-4'>
-      <p className="font-semibold mb-2">{product.productName}</p>
-      <img className="object-cover w-full h-32 rounded-md" src={product.image_url} alt={product.productName} />
-      <div className="my-2">
-        <p className="text-sm ">Sisa Stok: <span className="text-[#45c517]">{product.stok}</span></p>
-        <div className="duration-300 transition w-full flex gap-3 my-2">
-          <Link to={`/share-meals/update/${product.id}`}>
-            <button className="duration-300 transition hover:bg-green-600 bg-[#45c517] text-white px-3 rounded-xl">Edit</button>
+    <div className='hover:cursor-pointer w-64 bg-white shadow-md rounded-xl overflow-hidden'>
+      <img 
+        className="object-cover w-full h-40" 
+        src={product.image_url} 
+        alt={product.productName} 
+      />
+      <div className="p-4">
+        <h3 className="font-semibold text-lg mb-2 truncate">{product.productName}</h3>
+        <p className="text-sm mb-4">Sisa Stok: <span className="text-[#45c517]">{product.stok}</span></p>
+        <div className="flex justify-between gap-2">
+          <Link to={`/share-meals/update/${product.id}`} className="flex-1">
+            <button className="w-full duration-300 transition hover:bg-green-600 bg-[#45c517] text-white py-2 rounded-lg">
+              Edit
+            </button>
           </Link>
-          <button className="duration-300 transition hover:bg-[#45c517] hover:text-white bg-white border border-[#45c517] text-[#45c517] px-3 rounded-xl">Hapus</button>
+          <button className="flex-1 duration-300 transition hover:bg-[#45c517] hover:text-white bg-white border border-[#45c517] text-[#45c517] py-2 rounded-lg">
+            Hapus
+          </button>
         </div>
       </div>
     </div>

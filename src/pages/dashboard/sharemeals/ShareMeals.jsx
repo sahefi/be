@@ -31,29 +31,29 @@ const ShareMeals = () => {
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
           <Navbar />
-
-          <h1 className="mt-5 mx-10 text-[#45c517] text-2xl font-bold">Share Meals</h1>
-         
-
-          <div className="mt-5 mx-10 flex min-h-screen flex-col gap-5">
-            {/* Kelola produk */}
+          
+          <div className="p-10">
+            <h1 className="text-[#45c517] text-2xl font-bold mb-4">Share Meals</h1>
+            
             <section>
-              <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Produk yang anda bagikan</h1>
-              <div className="flex-wrap justify-between flex gap-5">
+              <h2 className="text-xl font-semibold text-[#45c517] mb-3">
+                Produk yang anda bagikan
+              </h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {products.map(product => (
                   <CardShareMeals key={product.id} product={product} />
                 ))}
               </div>
             </section>
 
-            <div className="fixed right-10 top-[85%] transform -translate-y-1/2 w-48">
+            <div className="fixed right-10 bottom-10">
               <Link to="/share-meals/form">
-                <button className="bg-[#47cb18] hover:bg-green-600 text-white px-6 py-2 rounded-full">
+                <button className="bg-[#47cb18] hover:bg-green-600 text-white px-8 py-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl">
                   Bagikan Produk
                 </button>
               </Link>
             </div>
-
           </div>
         </div>
       </section>

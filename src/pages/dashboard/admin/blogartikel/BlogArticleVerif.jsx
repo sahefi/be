@@ -35,6 +35,7 @@ const BlogArticleVerif = () => {
                     <h1 className="mt-5 mx-10 text-2xl font-bold text-[#45c517]">
                         Verifikasi Blog & Article
                     </h1>
+                  
                     <section className="min-h-screen mx-10 my-5 p-5 rounded-md bg-white shadow-md">
                         {/* Tabs */}
                         <div className="font-semibold flex gap-7">

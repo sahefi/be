@@ -2,7 +2,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import SidebarAdmin from "../../../../components/dashboard/admin/SidebarAdmin";
 import Navbar from "../../../../components/dashboard/Navbar";
-import lembagaSosialData from "../../../../assets/lembagasosial/lembagaSosialData.json";
+import lembagaSosialData from "../../../../assets/charitycampaign/lembagaSosialData.json";
 
 const CampaignDetailVerif = () => {
     const { id } = useParams();

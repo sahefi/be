@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useState } from 'react';
-import charityData from '../../../assets/lembagasosial/lembagaSosialData.json';
+import charityData from '../../../assets/charitycampaign/lembagaSosialData.json';
 import Sidebar from '../../../components/dashboard/Sidebar';
 import Navbar from '../../../components/dashboard/Navbar';
 import { Link } from 'react-router-dom';

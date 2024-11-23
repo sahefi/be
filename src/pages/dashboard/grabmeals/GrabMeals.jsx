@@ -1,3 +1,4 @@
+// GrabMeals.jsx
 import { useEffect, useState } from 'react';
 import Sidebar from "../../../components/dashboard/Sidebar";
 import Navbar from "../../../components/dashboard/Navbar";
@@ -24,6 +25,27 @@ const GrabMeals = () => {
       .catch((error) => console.error('Error fetching category data:', error));
   }, []);
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.2,
+      }
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    },
+  };
+
   // Filter Icon Component
   const FilterIcon = () => (
     <svg
@@ -40,37 +62,50 @@ const GrabMeals = () => {
   return (
     <motion.div
       className="flex min-h-screen"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
     >
       <Sidebar />
 
-      <section className="bg-[#f4fef1]  pl-60 pt-20">
+      <section className="bg-[#f4fef1] pl-60 pt-20">
         <div className="flex-grow mb-5">
           {/* Header Section */}
           <Navbar showSearchBar={true} />
-          <h1 className="mt-5 mx-10 text-2xl font-bold text-[#45c517]">
+          
+          <motion.h1 
+            className="mt-5 mx-10 text-2xl font-bold text-[#45c517]"
+            variants={itemVariants}
+          >
             Grab Meals
-          </h1>
+          </motion.h1>
 
           {/* Main Content */}
-          <section className="min-h-screen mx-10">
+          <motion.section 
+            className="min-h-screen mx-10"
+            variants={itemVariants}
+          >
             {/* Categories Section */}
-            <div className="flex items-center gap-3">
+            <motion.div 
+              className="flex items-center gap-3"
+              variants={itemVariants}
+            >
               <FilterIcon />
               <div className="overflow-x-auto whitespace-nowrap max-w-full">
                 <CategoryCard categories={categories} />
               </div>
-            </div>
+            </motion.div>
 
             {/* Products Grid */}
-            <div className="flex gap-5 justify-between flex-wrap">
+            <motion.div 
+              className="flex gap-5 justify-between flex-wrap mt-5"
+              variants={itemVariants}
+            >
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
-            </div>
-          </section>
+            </motion.div>
+          </motion.section>
         </div>
       </section>
     </motion.div>
