@@ -15,7 +15,7 @@ const Sidebar = () => {
         GRAB_MEALS: ['/grab-meals', '/product', '/payment', '/payment-product'],
         SHARE_MEALS: ['/share-meals', '/share-meals-form'],
         CHARITY: ['/charity-campaign', '/charity-detail', '/campaign-form', '/charity-transaction', '/payment-charity'],
-        BLOG: ['/blog', '/article'],
+        BLOG: ['/blog', '/article','/article-form'],
         ACTIVITY: ['/share-activity']
     };
 

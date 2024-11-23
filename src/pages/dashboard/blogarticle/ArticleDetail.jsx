@@ -56,7 +56,7 @@ const ArticleDetail = () => {
                                         src={article.img_content}
                                         alt={article.title}
                                     />
-                                    <p className="mt-5 text-md">
+                                    <p className="mt-5 text-md whitespace-pre-wrap">
                                         {article.content}
                                     </p>
                                 </div>

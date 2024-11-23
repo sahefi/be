@@ -4,6 +4,8 @@ import Sidebar from '../../components/dashboard/Sidebar';
 import Navbar from '../../components/dashboard/Navbar';
 
 const PaymentMethod = () => {
+    const [isLoading, setIsLoading] = useState(false);
+
     const navigate = useNavigate(); // Add this
 
     // Add new state
@@ -70,8 +72,13 @@ const PaymentMethod = () => {
 
     // Update handleConfirmPayment
     const handleConfirmPayment = () => {
-        setInvoiceNumber(generateInvoiceNumber());
-        setShowConfirmation(true);
+        setIsLoading(true);
+        // Simulate payment processing
+        setTimeout(() => {
+            setInvoiceNumber(generateInvoiceNumber());
+            setIsLoading(false);
+            setShowConfirmation(true);
+        }, 2000);
     };
 
     return (
@@ -204,11 +211,45 @@ const PaymentMethod = () => {
                                     </div>
                                 </div>
 
+                                {/* Add loading button state */}
                                 <div
-                                    onClick={handleConfirmPayment}
-                                    className="hover:cursor-pointer hover:bg-green-600 bg-[#45c517] p-1 py-2 text-center rounded-full"
+                                    onClick={!isLoading ? handleConfirmPayment : undefined}
+                                    className={`${isLoading
+                                            ? 'bg-gray-400 cursor-not-allowed'
+                                            : 'hover:cursor-pointer hover:bg-green-600 bg-[#45c517]'
+                                        } p-1 py-2 text-center rounded-full`}
                                 >
-                                    <h1 className="text-white text-base font-semibold">Konfirmasi Pembayaran</h1>
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center gap-2">
+                                            <svg
+                                                className="animate-spin h-5 w-5 text-white"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                />
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                />
+                                            </svg>
+                                            <span className="text-white text-base font-semibold">
+                                                Memproses...
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <h1 className="text-white text-base font-semibold">
+                                            Konfirmasi Pembayaran
+                                        </h1>
+                                    )}
                                 </div>
                             </div>
                         </div>

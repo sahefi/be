@@ -1,74 +1,132 @@
-import { useState } from "react";
+import { useState } from 'react';
 import Navbar from '../../../components/dashboard/Navbar';
 import Sidebar from '../../../components/dashboard/Sidebar';
 
 const ArticleForm = () => {
-    // State management
-    const [formData, setFormData] = useState({
-        title: '',
-        content: '',
-        category: ''
-    });
-    const [image, setImage] = useState(null);
-    const [error, setError] = useState('');
 
-    // Handle input changes
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
+
+
+    const categories = [
+        'Technology',
+        'Health',
+        'Business',
+        'Lifestyle',
+        'Education'
+    ];
+
+    // Add preview update function
+    const updatePreview = (form) => {
+        const previewTitle = document.getElementById('previewTitle');
+        const previewContent = document.getElementById('previewContent');
+        const previewCategory = document.getElementById('previewCategory');
+
+        if (previewTitle) previewTitle.textContent = form.title.value || 'Judul Artikel';
+        if (previewContent) previewContent.textContent = form.content.value || 'Konten artikel akan ditampilkan di sini...';
+        if (previewCategory) previewCategory.textContent = form.category.value || 'Kategori';
     };
 
-    // Handle image upload
-    const handleFileChange = (e) => {
+
+    const handleInputChange = (e) => {
+        clearError(e.target);
+        updatePreview(e.target.form);
+    };
+
+    // Update the showSuccess function
+    const showSuccess = (message) => {
+        const successMessage = document.getElementById('successMessage');
+        successMessage.textContent = message;
+    };
+    const handleImageChange = (e) => {
         const file = e.target.files[0];
+        const previewElement = document.getElementById('imagePreview');
+
         if (file) {
-            if (file.size > 2000000) { // 2MB limit
-                setError('File terlalu besar. Maksimal 2MB');
-                return;
-            }
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImage(reader.result);
-                setError('');
+                previewElement.innerHTML = `
+                    <img src="${reader.result}" 
+                         alt="Preview" 
+                         class="max-w-[200px] h-auto rounded-md"
+                    />`;
             };
             reader.readAsDataURL(file);
+        } else {
+            previewElement.innerHTML = '';
         }
     };
 
-    // Handle form submission
+    const clearError = (element) => {
+        const errorElement = document.getElementById(`${element.name}Error`);
+        if (errorElement) {
+            errorElement.textContent = '';
+        }
+    };
+
+    const validateForm = (formElement) => {
+        const title = formElement.title.value;
+        const content = formElement.content.value;
+        const category = formElement.category.value;
+        const imageFile = formElement.image.files[0];
+        let isValid = true;
+
+        if (!title.trim()) {
+            document.getElementById('titleError').textContent = 'Judul harus diisi';
+            isValid = false;
+        }
+        if (!content.trim()) {
+            document.getElementById('contentError').textContent = 'Konten harus diisi';
+            isValid = false;
+        }
+        if (!category) {
+            document.getElementById('categoryError').textContent = 'Kategori harus dipilih';
+            isValid = false;
+        }
+        if (!imageFile) {
+            document.getElementById('imageError').textContent = 'Foto harus diunggah';
+            isValid = false;
+        }
+
+        return isValid;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // Validation
-        if (!image || !formData.title || !formData.content || !formData.category) {
-            setError('Semua field harus diisi');
+        const form = e.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const errorMessage = document.getElementById('formError');
+        const imagePreview = document.getElementById('imagePreview');
+
+        if (!validateForm(form)) {
+            errorMessage.textContent = 'Mohon lengkapi semua field yang diperlukan';
             return;
         }
 
-        // Process form data
-        const articleData = {
-            ...formData,
-            image: image,
-            createdAt: new Date().toISOString()
-        };
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
+        errorMessage.textContent = '';
 
-        // TODO: Send to API
-        console.log('Article Data:', articleData);
+        // Get image URL from preview
+        const imageUrl = imagePreview.querySelector('img')?.src || '';
 
-        // Reset form
-        setFormData({
-            title: '',
-            content: '',
-            category: ''
+        // Set preview data
+        setPreviewData({
+            title: form.title.value,
+            content: form.content.value,
+            category: form.category.value,
+            imageUrl: imageUrl
         });
-        setImage(null);
-        setError('');
+        setShowPreview(true);
+
+        // Simulate successful upload
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Upload Artikel';
+            showSuccess('Artikel berhasil diupload!');
+        }, 1000);
     };
 
-    // Return JSX with updated form
     return (
         <div className="flex min-h-screen">
             <Sidebar />
@@ -77,93 +135,127 @@ const ArticleForm = () => {
                     <Navbar />
                     <h1 className="mt-5 text-[#45c517] mx-10 text-2xl font-bold">Blog & Article</h1>
 
-                    <div className="mt-5 p-3 rounded-md bg-white mb-5 shadow-md mx-10 flex min-h-screen flex-col gap-5">
-                        <h1 className='text-xl text-[#45c517] font-semibold'>Form Artikel</h1>
-                        
-                        {error && (
-                            <p className="text-red-500 text-sm">{error}</p>
-                        )}
+                    <div className="mt-5 p-3 rounded-md bg-white mb-5 shadow-md mx-10 flex flex-row gap-8">
+                        {/* Form Section */}
+                        <div className="flex-1">
+                            <h1 className='text-xl text-[#45c517] font-semibold'>Form Artikel</h1>
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Foto Artikel</label>
+                                    <div className="relative">
+                                        <input
+                                            type="file"
+                                            name="image"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                handleImageChange(e);
+                                                handleInputChange(e);
+                                            }}
+                                            className="hidden"
+                                            id="file-upload"
+                                        />
+                                        <label
+                                            htmlFor="file-upload"
+                                            className="flex items-center gap-2 px-4 py-2 border-2 border-[#45c517] text-[#45c517] rounded-md cursor-pointer hover:bg-[#45c517] hover:text-white transition-all duration-300"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                                                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                                            </svg>
+                                            <span>Pilih File</span>
+                                        </label>
+                                    </div>
+                                    <div id="imagePreview" className="mt-2"></div>
+                                    <h2 id="imageError" className="text-red-500 text-sm"></h2>
+                                </div>
 
-                        <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
-                            <div className="flex flex-col">
-                                <label>Thumbnail Artikel</label>
-                                <div className="flex gap-4 mt-2">
-                                    <div className="w-48 h-48 border-2 border-green-300 overflow-hidden rounded-xl flex items-center justify-center relative">
-                                        {image ? (
-                                            <div className="relative w-full h-full">
-                                                <img
-                                                    src={image}
-                                                    alt="Foto Artikel"
-                                                    className="w-full h-full object-cover rounded-xl"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setImage(null)}
-                                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                                                >
-                                                    ×
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <label className="flex flex-col items-center justify-center cursor-pointer text-gray-500 bg-gray-100 w-full h-full rounded-md">
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleFileChange}
-                                                    className="hidden"
-                                                />
-                                                <span className="text-xs">Tambah Foto</span>
-                                            </label>
-                                        )}
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Judul Artikel</label>
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        onInput={handleInputChange}
+                                        className="w-full px-4 py-2 border-2 border-gray-200 rounded-md focus:border-[#45c517] focus:outline-none transition-colors duration-300"
+                                        placeholder="Masukkan judul artikel"
+                                    />
+                                    <h2 id="titleError" className="text-red-500 text-sm"></h2>
+                                </div>
+
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Konten Artikel</label>
+                                    <textarea
+                                        name="content"
+                                        onInput={handleInputChange}
+                                        className="w-full px-4 py-2 border-2 border-gray-200 rounded-md focus:border-[#45c517] focus:outline-none transition-colors duration-300 min-h-[200px] resize-y"
+                                        placeholder="Tulis konten artikel"
+                                    />
+                                    <h2 id="contentError" className="text-red-500 text-sm"></h2>
+                                </div>
+
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Kategori</label>
+                                    <select
+                                        name="category"
+                                        onChange={handleInputChange}
+                                        className="w-full px-4 py-2 border-2 border-gray-200 rounded-md focus:border-[#45c517] focus:outline-none transition-colors duration-300 appearance-none bg-white cursor-pointer"
+                                    >
+                                        <option value="" disabled>Pilih Kategori</option>
+                                        {categories.map((category) => (
+                                            <option key={category} value={category}>
+                                                {category}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <h2 id="categoryError" className="text-red-500 text-sm"></h2>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        type="submit"
+                                        className="  bg-[#45c517] text-white px-6 py-2 rounded-full hover:bg-[#3ba913] transition-colors duration-300 font-medium whitespace-nowrap"
+                                    >
+                                        Upload Artikel
+                                    </button>
+                                    <div className="flex-1 grid grid-cols-1 gap-2">
+                                        <h2 id="formError" className="text-red-500 text-md line-clamp-2"></h2>
+                                        <h2 id="successMessage" className="text-[#45c517] text-md font-medium line-clamp-2"></h2>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Preview Card Section */}
+                        <div className="flex-1">
+                            <h1 className='text-xl text-[#45c517] font-semibold mb-6'>Preview Artikel</h1>
+                            <div className={`border rounded-lg shadow-md p-4 ${!showPreview ? 'blur-sm' : ''}`}>
+                                <div className="w-full h-48 bg-gray-100 rounded-md mb-4 overflow-hidden">
+                                    {previewData && previewData.imageUrl ? (
+                                        <img
+                                            src={previewData.imageUrl}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                            No Image Available
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-4">
+                                    <h2 className="text-xl font-semibold">
+                                        {previewData ? previewData.title : 'Judul Artikel'}
+                                    </h2>
+                                    <span className="inline-block bg-[#45c517] text-white px-3 py-1 rounded-full text-sm">
+                                        {previewData ? previewData.category : 'Kategori'}
+                                    </span>
+                                    <div className="max-h-[150px] overflow-y-auto pr-2">
+                                        <p className="text-gray-600">
+                                            {previewData ? previewData.content : 'Konten artikel akan ditampilkan di sini setelah Anda mengunggah.'}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="flex flex-col">
-                                <label>Judul Artikel</label>
-                                <input
-                                    name="title"
-                                    value={formData.title}
-                                    onChange={handleInputChange}
-                                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                    type="text"
-                                    placeholder="Masukkan judul artikel"
-                                />
-                            </div>
-
-                            <div className="flex flex-col">
-                                <label>Konten Artikel</label>
-                                <textarea
-                                    name="content"
-                                    value={formData.content}
-                                    onChange={handleInputChange}
-                                    placeholder="Tulis konten artikel"
-                                    className="rounded-2xl pl-3 border-2 border-green-300 p-3 mt-2 h-48 overflow-y-auto"
-                                />
-                            </div>
-
-                            <div className="flex flex-col">
-                                <label>Kategori Artikel</label>
-                                <select
-                                    name="category"
-                                    value={formData.category}
-                                    onChange={handleInputChange}
-                                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                >
-                                    <option value="">Pilih Kategori Artikel</option>
-                                    <option value="opsi1">Opsi 1</option>
-                                    <option value="opsi2">Opsi 2</option>
-                                    <option value="opsi3">Opsi 3</option>
-                                </select>
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="py-2 text-white rounded-full w-32 bg-[#47cb18] mt-4 mb-5 hover:bg-green-600"
-                            >
-                                Upload
-                            </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </section>

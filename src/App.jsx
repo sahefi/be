@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomeDashboard from './pages/Dashboard/HomeDashboard';
+import HomeDashboard from './pages/dashboard/HomeDashboard';
 import ShareMeals from './pages/dashboard/sharemeals/ShareMeals';
 import GrabMeals from './pages/dashboard/grabmeals/GrabMeals';
 import CharityCampaign from './pages/dashboard/charitycampaign/CharityCampaign';
@@ -27,6 +27,10 @@ import AdminDashboard from './pages/dashboard/admin/AdminDashboard';
 import ShareMealsVerif from './pages/dashboard/admin/ShareMealsVerif';
 import CampaignVerif from './pages/dashboard/admin/charitycampaign/CampaignVerif';
 import CampaignDetailVerif from './pages/dashboard/admin/charitycampaign/CampaignDetailVerif';
+import BlogArticleVerif from './pages/dashboard/admin/blogartikel/BlogArticleVerif';
+import ArticleVerifDetail from './pages/dashboard/admin/blogartikel/ArticleVerifDetail';
+import AccountDetailVerif from './components/dashboard/admin/AccountDetailVerif';
+
 const App = () => {
   return (
     <div>
@@ -62,6 +66,9 @@ const App = () => {
           <Route path="/share-meals-verif" element={<ShareMealsVerif />} />
           <Route path="/campaign-verif" element={<CampaignVerif />} />
           <Route path="/campaign-detail-verif/:id" element={<CampaignDetailVerif />} />
+          <Route path="/article-verif" element={<BlogArticleVerif />} />
+          <Route path="/article-detail-verif/:id" element={<ArticleVerifDetail />} />
+          <Route path="/account-verif/:id" element={<AccountDetailVerif />} />
         </Routes>
       </Router>
 

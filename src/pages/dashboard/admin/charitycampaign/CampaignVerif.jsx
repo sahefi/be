@@ -1,20 +1,27 @@
 import { useState } from "react";
 import SidebarAdmin from "../../../../components/dashboard/admin/SidebarAdmin";
-import Navbar from "../../../../components/dashboard/Navbar";
+import NavbarAdmin from "../../../../components/dashboard/admin/NavbarAdmin";
 import lembagaSosialData from "../../../../assets/lembagasosial/lembagaSosialData.json";
 import { useNavigate } from "react-router-dom";
 
 const CampaignVerif = () => {
   const [activeTab, setActiveTab] = useState("Draft");
   const navigate = useNavigate();
-  const handleDetailClick = (id) => {
-    navigate(`/campaign-detail-verif/${id}`);
+
+  const handleDetailClick = (campaign) => {
+    navigate(`/campaign-detail-verif/${campaign.id}`, {
+      state: {
+        status: activeTab,
+        showButtons: activeTab !== "Rejected"
+      }
+    });
   };
 
+
   const campaigns = {
-    Draft: [lembagaSosialData[0]],     // Data ke-1 masuk ke Draft
-    Accepted: [lembagaSosialData[1]],  // Data ke-2 masuk ke Accepted
-    Rejected: [lembagaSosialData[2]],  // Data ke-3 masuk ke Rejected
+    Draft: [lembagaSosialData[0]],
+    Accepted: [lembagaSosialData[1]],
+    Rejected: [lembagaSosialData[2]],
   };
 
   return (
@@ -23,10 +30,24 @@ const CampaignVerif = () => {
 
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
-          <Navbar />
+          <NavbarAdmin />
           <h1 className="mt-5 mx-10 text-2xl text-[#45c517] font-bold">
             Verifikasi Charity
           </h1>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="50"
+            height="50"
+            fill="currentColor"
+            className="text-green-500 hover:cursor-pointer mx-10 bi bi-arrow-left-short"
+            viewBox="0 0 16 16"
+            onClick={() => window.history.back()}
+          >
+            <path
+              fillRule="evenodd"
+              d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
+            />
+          </svg>
           <section className="min-h-screen mx-10 my-5 p-5 rounded-md bg-white shadow-md">
             {/* Tabs */}
             <div className="font-semibold flex gap-7">
@@ -86,12 +107,16 @@ const CampaignVerif = () => {
                         <span className="block truncate">{campaign.campaign_title}</span>
                       </td>
                       <td className="px-4 py-2 text-right">
-                        <button
-                          onClick={() => handleDetailClick(campaign.id)}
-                          className="bg-[#45c517] text-white w-32 py-2 rounded-full hover:opacity-90 text-sm font-medium"
-                        >
-                          Lihat Detail
-                        </button>
+                        {activeTab !== "Rejected" ? (
+                          <button
+                            onClick={() => handleDetailClick(campaign)}
+                            className="bg-[#45c517] text-white w-32 py-2 rounded-full hover:opacity-90 text-sm font-medium"
+                          >
+                            Lihat Detail
+                          </button>
+                        ) : (
+                          <span className="text-gray-500">Rejected</span>
+                        )}
                       </td>
                     </tr>
                   ))}
