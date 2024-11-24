@@ -5,6 +5,7 @@ import Sidebar from "../../../components/dashboard/Sidebar";
 import Navbar from "../../../components/dashboard/Navbar";
 import kotaData from "../../../assets/sharemeals/kotaData.json";
 import categoryList from "../../../../public/categoryList.json";
+import axios from "axios";
 
 const ShareMealsForm = () => {
   const navigate = useNavigate();
@@ -14,7 +15,8 @@ const ShareMealsForm = () => {
   const [productDescription, setProductDescription] = useState("");
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState("");
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState(Array(5).fill(null));
+  const [saveImages, setSaveImages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedKota, setSelectedKota] = useState("");
   const [selectedKecamatan, setSelectedKecamatan] = useState("");
@@ -34,51 +36,108 @@ const ShareMealsForm = () => {
   const kecamatanData = selectedKota ? kotaData[selectedKota] : {};
   const kelurahanData = selectedKecamatan ? kecamatanData[selectedKecamatan] : [];
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+  const handleFileChange = (e, index) => {
+    const files = Array.from(e.target.files); // Mengonversi FileList menjadi array
+  
+    setSaveImages((prevImages) => {
+      return [...prevImages, ...files]; // Menambahkan semua file ke array sebelumnya
+    }); // Simpan semua file yang dipilih
+    
+    if (files && files.length > 0) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImage(reader.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(files[0]); // Gunakan file pertama untuk preview
     }
   };
-
-  const handleDeleteImage = () => {
-    setImage(null);
+  
+  const handleDeleteImage = (index) => {
+    const newImages = [...images];
+    newImages[index] = null;
+    setImages(newImages);
   };
-
+  
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     setDate(selectedDate);
   };
-
-  const handleSubmit = (e) => {
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validasi form
-    if (!productName || !productDescription || !price || !selectedCategory || !pickupLocation || !date || !time) {
+    if (
+      !productName ||
+      !productDescription ||
+      !price ||
+      !selectedCategory ||
+      !pickupLocation ||
+      !date ||
+      !time
+    ) {
       alert("Mohon lengkapi semua data yang diperlukan.");
       return;
     }
-
-
-    // Reset form setelah berhasil
-    setProductName("");
-    setProductDescription("");
-    setStock(0);
-    setPrice("");
-    setImages(Array(5).fill(null));
-    setSelectedCategory("");
-    setSelectedKota("");
-    setSelectedKecamatan("");
-    setSelectedKelurahan("");
-    setPickupLocation("");
-    setDate("");
-    setTime("");
-
-    navigate("/share-meals");
+  
+    // Create a FormData object to handle file uploads
+    const formData = new FormData();
+    formData.append("nama_produk", productName);
+    formData.append("deskripsi_produk", productDescription);
+    formData.append("jumlah_produk", stock);
+    formData.append("harga", price);
+    formData.append("kategori_produk", selectedCategory);
+    formData.append("kota", selectedKota);
+    formData.append("kecamatan", selectedKecamatan);
+    formData.append("kelurahan", selectedKelurahan);
+    formData.append("alamat", pickupLocation);
+    formData.append("tanggal_pengambilan", date);
+    formData.append("jam", time);
+  
+    // Tambahkan semua file ke FormData
+    if (saveImages && saveImages.length > 0) {
+      for (let i = 0; i < saveImages.length; i++) {
+        console.log(saveImages);
+        
+        formData.append("files", saveImages[i]); // Key "files" diulang untuk array
+      }
+    }
+  
+    try {
+      // Send POST request to the API
+      const response = await axios.post("http://localhost:8085/produk", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Important for file uploads
+        },
+      });
+  
+      if (response.status === 200) {
+        // If the request was successful, reset form and navigate
+        alert("Produk berhasil diupload!");
+  
+        // Reset form fields
+        setProductName("");
+        setProductDescription("");
+        setStock(0);
+        setPrice("");
+        setImages(Array(5).fill(null));
+        setSelectedCategory("");
+        setSelectedKota("");
+        setSelectedKecamatan("");
+        setSelectedKelurahan("");
+        setPickupLocation("");
+        setDate("");
+        setTime("");
+  
+        // Navigate to the share meals page or other desired route
+        navigate("/share-meals");
+      } else {
+        alert("Terjadi kesalahan. Silakan coba lagi.");
+      }
+    } catch (error) {
+      console.error("Error uploading product:", error);
+      alert("Terjadi kesalahan saat mengupload produk. Silakan coba lagi.");
+    }
   };
 
   return (

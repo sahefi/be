@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import userData from '../../assets/user/userData.json';
 import { FaSearch } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
@@ -12,10 +11,11 @@ const Navbar = ({ showSearchBar }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  // Fetch user data from localStorage
+  const userData = JSON.parse(localStorage.getItem('user')) || {}; // Default to empty object if not found
 
-
-  // Close dropdown when clicking outside
   useEffect(() => {
+    // Close dropdown when clicking outside
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
@@ -43,8 +43,8 @@ const Navbar = ({ showSearchBar }) => {
         </div>
       )}
 
-      {!showSearchBar && (
-        <h1 className='text-xl font-semibold'>Welcome, {userData.user.name}!</h1>
+      {!showSearchBar && userData.nama_user && (
+        <h1 className='text-xl font-semibold'>Welcome, {userData.nama_user}!</h1>
       )}
 
       <ul className=" flex items-center gap-5">
@@ -52,12 +52,12 @@ const Navbar = ({ showSearchBar }) => {
         <NavLink
           to="/cart"
           className={({ isActive }) => `
-    hover:cursor-pointer 
-    hover:text-[#45c517] 
-    transition-colors 
-    duration-200 
-    ${isActive ? 'text-[#45c517]' : 'text-gray-500'}
-  `}
+            hover:cursor-pointer 
+            hover:text-[#45c517] 
+            transition-colors 
+            duration-200 
+            ${isActive ? 'text-[#45c517]' : 'text-gray-500'}
+          `}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@ const Navbar = ({ showSearchBar }) => {
         <div className="flex items-center gap-2 relative" ref={dropdownRef}>
           <div className="border-2 border-[#45c517] rounded-full">
             <img
-              src={userData.user.image_url}
+              src={userData?.avatar || '../../../../public/profile.png'}  // Default image if not found
               alt=""
               className="min-w-5 h-5 object-cover rounded-full"
             />
@@ -86,8 +86,8 @@ const Navbar = ({ showSearchBar }) => {
 
           <div className='flex items-center gap-3'>
             <div>
-              <h1>{userData.user.name}</h1>
-              <h1 className="text-xs">{userData.user.location}</h1>
+              <h1>{userData.nama_user || "User"}</h1>
+              <h1 className="text-xs">{userData.alamat || "Malang, Indonesia"}</h1>
             </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,6 @@ const Navbar = ({ showSearchBar }) => {
                 <Link to="/profile">
                   <li
                     className="px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer"
-
                   >
                     Profile
                   </li>
@@ -116,14 +115,12 @@ const Navbar = ({ showSearchBar }) => {
 
                 <li
                   className="px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer"
-
                 >
                   Help & Support
                 </li>
                 <Link to="/">
                   <li
                     className="px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer text-red-600"
-
                   >
                     Logout
                   </li>
@@ -132,8 +129,6 @@ const Navbar = ({ showSearchBar }) => {
               </ul>
             </div>
           )}
-
-
         </div>
       </ul>
     </nav>

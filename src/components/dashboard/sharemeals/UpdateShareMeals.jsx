@@ -3,23 +3,24 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from "../../../components/dashboard/Sidebar";
 import Navbar from "../../../components/dashboard/Navbar";
 import kotaData from "../../../assets/sharemeals/kotaData.json";
-import productData from "../../../../public/productData.json";
 import categoryList from '../../../../public/categoryList.json';  // Adjust path as needed
+import axios from "axios";
+import moment from "moment";
 
 
 const UpdateShareMeals = () => {
     // 1. State Declarations
     const [formData, setFormData] = useState({
-        productName: "",
-        description: "",
-        stock: 0,
-        price: "",
+        nama_produk: "",
+        deskripsi_produk: "",
+        jumlah_produk: 0,
+        harga: "",
         images: Array(5).fill(null),
         category: "",
         kota: "",
         kecamatan: "",
         kelurahan: "",
-        detail: "",
+        alamat: "",
         date: "",
         time: ""
     });
@@ -27,7 +28,8 @@ const UpdateShareMeals = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [error, setError] = useState(null);
-
+    const [images, setImages] = useState(Array(5).fill(null));
+    const [saveImages, setSaveImages] = useState([]);
 
     // 2. Hooks
     const navigate = useNavigate();
@@ -82,29 +84,28 @@ const UpdateShareMeals = () => {
     useEffect(() => {
         const loadProduct = async () => {
             try {
-                const product = productData.find(item => item.id === +id);
-                if (!product) throw new Error("Produk tidak ditemukan");
-
-
-                const [kelurahan = "", kecamatan = "", kota = "", detail = ""] =
-                    product.address?.split(", ") ?? [];
+                const list = await axios.get(`http://localhost:8085/produk/${id}`);
+                if (!list) throw new Error("Produk tidak ditemukan");
+                const product = list.data                                            
 
 
                 setFormData({
                     ...formData,
-                    productName: product.productName ?? "",
-                    description: product.description ?? "",
-                    stock: product.stok ?? 0,
-                    price: product.price?.toString() ?? "",
-                    images: [product.image_url, ...Array(4).fill(null)],
-                    category: product.category ?? "",
-                    kota,
-                    kecamatan,
-                    kelurahan,
-                    detail,
-                    date: product.date ?? "",
-                    time: formatTimeForDisplay(product.timeOver) ?? "",
+                    nama_produk: product.nama_produk ?? "",
+                    deskripsi_produk: product.deskripsi_produk ?? "",
+                    jumlah_produk: product.jumlah_produk ?? 0,
+                    harga: product.harga?.toString() ?? "",
+                    images: [...(product.filename || []), ...Array(5 - (product.filename?.length || 0)).fill(null)].slice(0, 5),
+                    category: product.kategori_produk ?? "",
+                    kategori_produk:product.kategori_produk ?? "",
+                    kota : product.kota ,
+                    kecamatan : product.kecamatan,
+                    kelurahan : product.kelurahan,
+                    alamat : product.alamat,
+                    tanggal_pengambilan:  moment(product.tanggal_pengambilan).format('DD-MM-YYYY')  ?? "",                                        
+                    jam: formatTimeForDisplay(product.jam) ?? "",
                 });
+                                
             } catch (err) {
                 setErrorMessage(err.message);
             } finally {
@@ -112,6 +113,8 @@ const UpdateShareMeals = () => {
             }
         };
         loadProduct();
+        console.log(formData);
+        
     }, [id]);
 
 
@@ -124,55 +127,113 @@ const UpdateShareMeals = () => {
     };
 
 
-    const handleFileChange = (index, file) => {
-        if (!file || file.size > 5_000_000) {
-            alert("Ukuran file terlalu besar. Maksimal 5MB");
-            return;
+    const handleFileChange = (e, index) => {
+        const files = Array.from(e.target.files); 
+      
+        setSaveImages((prevImages) => {
+          return [...prevImages, ...files]; 
+        }); 
+        console.log(saveImages);
+        
+        
+        if (files && files.length > 0) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setFormData((prevFormData) => {             
+              const updatedImages = [...(prevFormData.images || [])]; 
+              
+              // Perbarui gambar sesuai dengan indeks
+              updatedImages[index] = reader.result;
+        
+              return {
+                ...prevFormData,
+                images: updatedImages, // Perbarui images dengan data baru
+              };
+            });
+          };
+          reader.readAsDataURL(files[0]); 
         }
-
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const newImages = [...formData.images];
-            newImages[index] = reader.result;
-            updateField('images', newImages);
-        };
-        reader.readAsDataURL(file);
+      };
+      
+      const handleDeleteImage = (index) => {                
+        // Salin array gambar dari formData
+        setFormData((prevFormData) => {             
+            const updatedImages = [...(prevFormData.images || [])]; 
+            
+            // Ganti gambar pada indeks dengan null
+            updatedImages[index] = null;
+    
+            return {
+              ...prevFormData,
+              images: updatedImages, // Perbarui array images
+            };
+        });
     };
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-
-        const requiredFields = ['productName', 'description', 'price', 'category'];
+    
+        const requiredFields = ['nama_produk', 'deskripsi_produk', 'harga', 'category'];
         const missingFields = requiredFields.some(field => !formData[field]);
-
-
-        if (missingFields || !formData.detail || !formData.date || !formData.time) {
+    
+        if (missingFields || !formData.alamat || !formData.tanggal_pengambilan || !formData.jam) {
             alert("Mohon lengkapi semua data yang diperlukan.");
             return;
         }
+    
+        try {                            
+            const formDataToSend = new FormData();
 
+            // Menambahkan data lainnya terlebih dahulu
+            formDataToSend.append("id", id);
+            formDataToSend.append("nama_produk", formData.nama_produk);
+            formDataToSend.append("deskripsi_produk", formData.deskripsi_produk);
+            formDataToSend.append("jumlah_produk", formData.jumlah_produk);
+            formDataToSend.append("harga", formData.harga);
+            formDataToSend.append("kategori_produk", formData.category);
+            formDataToSend.append("kota", formData.kota);
+            formDataToSend.append("kecamatan", formData.kecamatan);
+            formDataToSend.append("kelurahan", formData.kelurahan);
+            formDataToSend.append("alamat", formData.alamat);
+            formDataToSend.append("tanggal_pengambilan", formData.tanggal_pengambilan);
+            formDataToSend.append("jam", formData.jam);
+            formDataToSend.append("updated_at", new Date().toISOString());
 
-        try {
-            const fullAddress = [formData.kelurahan, formData.kecamatan, formData.kota, formData.detail]
-                .filter(Boolean)
-                .join(", ");
-            const updatedProduct = {
-                id: +id,
-                ...formData,
-                stok: +formData.stock,
-                price: +formData.price,
-                image_url: formData.images[0],
-                address: fullAddress,
-                date: formData.date,
-                timeOver: formData.time,
-                updated_at: new Date().toISOString()
-            };
-
-
-            console.log('Updating product:', updatedProduct);
+            // Menambahkan gambar-gambar yang sudah ada (dari filename)
+            if (formData.images && formData.images.length > 0 && formData.images != null) {
+                for (let i = 0; i < formData.images.length; i++) {
+                    const imageUrl = formData.images[i];
+                    
+                    
+                    if (imageUrl != null) {                        
+                        const response = await fetch(imageUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], `existing-image-${i}`, { type: blob.type });
+    
+                        
+                        formDataToSend.append("files", file);
+                    }                    
+                }
+            }
+        
+            // Menambahkan gambar-gambar
+            if (saveImages && saveImages.length > 0) {
+                for (let i = 0; i < saveImages.length; i++) {
+                    console.log(saveImages[i]);
+                    formDataToSend.append("files", saveImages[i]); // Menambahkan gambar ke FormData
+                }
+            }
+    
+            console.log('Updating product:', formDataToSend);
+    
+            // Make the API request to update the product
+            const response = await axios.put(`http://localhost:8085/produk/${id}`, formDataToSend, {
+                headers: {
+                  "Content-Type": "multipart/form-data", // Important for file uploads
+                },
+              });           
+            
             alert("Produk berhasil diperbarui!");
             navigate("/share-meals");
         } catch (err) {
@@ -180,8 +241,6 @@ const UpdateShareMeals = () => {
             alert("Gagal memperbarui produk. Silakan coba lagi.");
         }
     };
-
-
     // 7. Render Conditions
     if (isLoading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
     if (errorMessage) return <div className="flex justify-center items-center min-h-screen text-red-500">{errorMessage}</div>;
@@ -250,10 +309,10 @@ const UpdateShareMeals = () => {
                                         <input
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                             type="text"
-                                            value={formData.productName}
+                                            value={formData.nama_produk}
                                             onChange={(e) => {
                                                 if (e.target.value.length <= 23) {
-                                                    updateField('productName', e.target.value);
+                                                    updateField('nama_produk', e.target.value);
                                                 }
                                             }}
                                             maxLength={23}
@@ -261,7 +320,7 @@ const UpdateShareMeals = () => {
                                             required
                                         />
                                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                                            {formData.productName.length}/23
+                                            {formData.nama_produk.length}/23
                                         </span>
                                     </div>
                                 </div>
@@ -270,44 +329,58 @@ const UpdateShareMeals = () => {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">Deskripsi Produk</label>
                                     <textarea
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                        rows="4"
-                                        value={formData.description}
-                                        onChange={(e) => updateField('description', e.target.value)}
-                                        placeholder="Masukkan deskripsi produk"
+                                        placeholder="Deskripsi produk"
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        rows="5"
+                                        value={formData.deskripsi_produk}
+                                        onChange={(e) => updateField('deskripsi_produk', e.target.value)}
                                         required
                                     ></textarea>
                                 </div>
 
-                                {/* Grid untuk Harga dan Stok */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Harga */}
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Harga</label>
-                                        <div className="relative">
-                                            <span className="absolute left-4 top-1/2 transform -translate-y-1/2">Rp</span>
-                                            <input
-                                                className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                                type="number"
-                                                value={formData.price}
-                                                onChange={(e) => updateField('price', e.target.value)}
-                                                placeholder="0"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
+                                {/* Harga Produk */}
+                                <div className="flex flex-col">
+                                    <label>Harga Produk</label>
+                                    <input
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        type="number"
+                                        value={formData.harga}
+                                        onChange={(e) => updateField('harga', e.target.value)}
+                                        placeholder="Masukkan harga produk"
+                                        required
+                                    />
+                                </div>
 
-                                    {/* Stok */}
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Stok</label>
-                                        <input
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            type="number"
-                                            value={formData.stock}
-                                            onChange={(e) => updateField('stock', e.target.value)}
-                                            placeholder="0"
-                                            required
-                                        />
+                                {/* Foto Produk */}
+                                <div className="flex flex-col mt-4">
+                                    <label>Foto Produk</label>
+                                    <div className="flex gap-4 mt-2">
+                                        {formData.images.map((image, index) => (
+                                            <div key={index} className="relative w-24 h-24 border rounded-md flex items-center justify-center">
+                                                {image ? (
+                                                    <>
+                                                        <img src={image} alt={`Foto ${index + 1}`} className="w-full h-full object-cover rounded-md" 
+                                                        onClick={(e) => handleFileChange(e, index)}
+                                                        />
+                                                        <button
+                                                            className="absolute top-1 right-1 bg-[#45c517] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                                                            onClick={() => handleDeleteImage(index)}
+                                                            type="button"
+                                                        >×</button>
+                                                    </>
+                                                ) : (
+                                                    <label className="flex flex-col items-center justify-center cursor-pointer text-gray-500 bg-gray-100 w-full h-full rounded-md">
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => handleFileChange(e,index)}
+                                                            className="hidden"
+                                                        />
+                                                        <span className="text-xs">Tambah Foto {index + 1}</span>
+                                                    </label>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -408,48 +481,39 @@ const UpdateShareMeals = () => {
                                         </div>
                                     </div>
 
-                                    {/* Detail Alamat */}
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Detail Alamat</label>
-                                        <textarea
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            rows="3"
-                                            value={formData.detail}
-                                            onChange={(e) => updateField('detail', e.target.value)}
-                                            placeholder="Masukkan detail alamat"
-                                            required
-                                        ></textarea>
-                                    </div>
+                                <div className="flex flex-col">
+                                    <label>Alamat Lengkap</label>
+                                    <input
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        type="text"
+                                        value={formData.alamat}
+                                        onChange={(e) => updateField('alamat', e.target.value)}
+                                        placeholder="Alamat Lengkap"
+                                        required
+                                    />
                                 </div>
 
-                                {/* Waktu Pengambilan */}
-                                <div className="space-y-6">
-                                    <h2 className="text-lg font-medium text-gray-700">Waktu Pengambilan</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Tanggal */}
-                                        <div>
-                                            <label className="block mb-2 font-medium text-gray-700">Tanggal</label>
-                                            <input
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                                type="date"
-                                                value={formatDateForInput(formData.date)}
-                                                onChange={(e) => updateField('date', formatDateForDisplay(e.target.value))}
-                                                required
-                                            />
-                                        </div>
+                                {/* Pickup Fields */}
+                                <div className="flex flex-col">
+                                    <label>Tanggal Pengambilan</label>
+                                    <input
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        type="date"
+                                        value={formatDateForInput(formData.tanggal_pengambilan)}
+                                        onChange={(e) => updateField('tanggal_pengambilan', formatDateForDisplay(e.target.value))}
+                                        required
+                                    />
+                                </div>
 
-                                        {/* Waktu */}
-                                        <div>
-                                            <label className="block mb-2 font-medium text-gray-700">Waktu</label>
-                                            <input
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                                type="time"
-                                                value={formatTimeForInput(formData.time)}
-                                                onChange={(e) => updateField('time', formatTimeForDisplay(e.target.value))}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
+                                <div className="flex flex-col">
+                                    <label>Jam Pengambilan</label>
+                                    <input
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        type="time"
+                                        value={formatTimeForInput(formData.jam)}
+                                        onChange={(e) => updateField('jam', formatTimeForDisplay(e.target.value))}
+                                        required
+                                    />
                                 </div>
 
                                 {/* Submit Button */}

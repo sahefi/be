@@ -1,12 +1,22 @@
 import Navbar from "../../components/dashboard/Navbar";
 import Sidebar from "../../components/dashboard/Sidebar";
-import userData from '../../assets/user/userData.json';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 const EditProfil = () => {
-    const [profileImage, setProfileImage] = useState(userData.user.image_url);
+    const [profileImage, setProfileImage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = useRef(null);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('user')); // Fetch user data from localStorage
+        console.log(storedUser);
+        
+        if (storedUser) {
+            setUser(storedUser);
+            setProfileImage(user?.avatar || '../../../../public/profile.png'); // Set profile image URL
+        }
+    }, []);
 
     const handleUploadClick = () => {
         fileInputRef.current.click();
@@ -18,22 +28,27 @@ const EditProfil = () => {
             setIsLoading(true);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProfileImage(reader.result);
+                setProfileImage(reader.result); // Set the new profile image
                 setIsLoading(false);
             };
             reader.readAsDataURL(file);
         }
     };
+
     const handleDeletePhoto = () => {
-        setProfileImage(userData.user.image_url); // Reset to default
+        setProfileImage(user?.avatar || '../../../../public/profile.png'); // Reset to the original image from localStorage
     };
+
+    if (!user) {
+        return <div>Loading...</div>; // Show loading state while user data is being fetched
+    }
 
     return (
         <div className="flex min-h-screen">
-            {/* Sidebar akan selalu fixed di sebelah kiri */}
+            {/* Sidebar will always be fixed on the left */}
             <Sidebar />
 
-            <section className="bg-[#f4fef1] w-full pl-60 pt-20"> {/* Tambahkan padding-top agar konten tidak tertutup */}
+            <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
                     <Navbar />
 
@@ -49,7 +64,7 @@ const EditProfil = () => {
                                     <div className="relative">
                                         <img
                                             className="rounded-full w-24 h-24 object-cover border-2 border-[#45c517]"
-                                            src={profileImage}
+                                            src={profileImage || '../../../../public/profile.png'} // Fallback to default image
                                             alt="Profile"
                                         />
                                         {isLoading && (
@@ -82,17 +97,14 @@ const EditProfil = () => {
                                 </div>
                             </div>
 
-                            <form className="mt-5 " action="">
+                            <form className="mt-5">
                                 <div className="flex flex-col gap-3 py-3 border-t border-b border-gray-200">
-                                    <label
-                                        className="font-semibold text-sm text-gray-700"
-                                        htmlFor="username"
-                                    >
+                                    <label className="font-semibold text-sm text-gray-700" htmlFor="username">
                                         Username
                                     </label>
                                     <div className="relative">
                                         <input
-                                            value={userData.user.username}
+                                            value={user.nama_user}
                                             id="username"
                                             name="username"
                                             type="text"
@@ -116,21 +128,18 @@ const EditProfil = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-3 py-3 border-t border-b border-gray-200">
-                                    <label
-                                        className="text-sm font-semibold text-gray-700"
-                                        htmlFor="username"
-                                    >
+                                    <label className="text-sm font-semibold text-gray-700" htmlFor="email">
                                         Email
                                     </label>
                                     <div className="relative">
                                         <input
-                                            value={userData.user.email}
-                                            id="username"
-                                            name="username"
-                                            type="text"
+                                            value={user.email}
+                                            id="email"
+                                            name="email"
+                                            type="email"
                                             className="w-full px-4 py-1 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         />
-                                        <svg
+                                          <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
                                             fill="none"
@@ -148,21 +157,18 @@ const EditProfil = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-3 py-3 border-t border-b border-gray-200">
-                                    <label
-                                        className="text-sm font-semibold text-gray-700"
-                                        htmlFor="username"
-                                    >
+                                    <label className="text-sm font-semibold text-gray-700" htmlFor="phone_number">
                                         Nomor Telepon
                                     </label>
                                     <div className="relative">
                                         <input
-                                            value={userData.user.phone_number}
-                                            id="username"
-                                            name="username"
+                                            value={user.no_telp || '082178187178'}
+                                            id="phone_number"
+                                            name="phone_number"
                                             type="text"
                                             className="w-full px-4 py-1 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         />
-                                        <svg
+                                          <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
                                             fill="none"
@@ -180,21 +186,18 @@ const EditProfil = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-3 py-3 border-t border-b border-gray-200">
-                                    <label
-                                        className="text-sm font-semibold text-gray-700"
-                                        htmlFor="username"
-                                    >
+                                    <label className="text-sm font-semibold text-gray-700" htmlFor="password">
                                         Password
                                     </label>
                                     <div className="relative">
                                         <input
-                                            value={userData.user.password}
-                                            id="username"
-                                            name="username"
-                                            type="text"
+                                            value={user.password}
+                                            id="password"
+                                            name="password"
+                                            type="password"
                                             className="w-full px-4 py-1 pl-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         />
-                                        <svg
+                                          <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
                                             fill="none"
@@ -213,16 +216,12 @@ const EditProfil = () => {
 
                                 <button className="mt-5 bg-[#45c517] px-3 py-1 rounded-full text-white">Simpan Perubahan</button>
                             </form>
-
-
                         </section>
-
                     </section>
                 </div>
             </section>
-
         </div>
-    )
-}
+    );
+};
 
-export default EditProfil
+export default EditProfil;

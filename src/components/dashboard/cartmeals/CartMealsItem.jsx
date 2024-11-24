@@ -1,6 +1,6 @@
 const CartMealsItem = ({ item, onRemove, onClick }) => {
-  const formatPrice = (price) => {
-    return `Rp${Number(price).toLocaleString('id-ID')}`;
+  const formatharga = (harga) => {
+    return `Rp${Number(harga).toLocaleString('id-ID')}`;
   };
 
   return (
@@ -18,10 +18,10 @@ const CartMealsItem = ({ item, onRemove, onClick }) => {
         <div>
           <h3 className="font-bold">{item.productName}</h3>
           <p className="text-sm text-gray-600">
-            {item.quantity} x {formatPrice(item.price)}
+            {item.quantity} x {formatharga(item.harga)}
           </p>
           <p className="text-sm text-gray-500">
-            Total: {formatPrice(item.price * item.quantity)}
+            Total: {formatharga(item.harga * item.quantity)}
           </p>
         </div>
       </div>

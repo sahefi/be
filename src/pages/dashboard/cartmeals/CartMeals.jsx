@@ -19,7 +19,7 @@ const CartMeals = () => {
   }
 
   function calculateTotal(items) {
-    return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return items.reduce((sum, item) => sum + (item.harga * item.quantity), 0);
   }
 
   function removeItem(productId) {

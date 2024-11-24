@@ -1,29 +1,49 @@
-// GrabMeals.jsx
 import { useEffect, useState } from 'react';
 import Sidebar from "../../../components/dashboard/Sidebar";
 import Navbar from "../../../components/dashboard/Navbar";
 import ProductCard from "../../../components/dashboard/grabmeals/ProductCard";
 import CategoryCard from "../../../components/dashboard/CategoryCard";
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 const GrabMeals = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState(null); // State for the selected filter
 
   // Data Fetching
   useEffect(() => {
     // Fetch Products
-    fetch('/productData.json')
-      .then((response) => response.json())
-      .then((data) => setProducts(data))
-      .catch((error) => console.error('Error fetching product data:', error));
-
+    axios.get('http://localhost:8085/produk')
+      .then((response) => {
+        setProducts(response.data);
+        setFilteredProducts(response.data); // Initially show all products
+      })
+      .catch((error) => {
+        console.error('Error fetching product data:', error);
+      });
+    
     // Fetch Categories
     fetch('/categoryList.json')
       .then((response) => response.json())
       .then((data) => setCategories(data))
       .catch((error) => console.error('Error fetching category data:', error));
   }, []);
+
+  // Handle Filter Change
+  const handleFilterChange = (category) => {        
+    setSelectedFilter(category);
+    
+    if (category) {
+      // Filter products based on selected category
+      const filtered = products.filter((product) => product.kategori_produk === category.name);
+      setFilteredProducts(filtered);
+    } else {
+      // Show all products if no category is selected
+      setFilteredProducts(products);
+    }
+  };
 
   // Animation variants
   const containerVariants = {
@@ -92,7 +112,11 @@ const GrabMeals = () => {
             >
               <FilterIcon />
               <div className="overflow-x-auto whitespace-nowrap max-w-full">
-                <CategoryCard categories={categories} />
+                <CategoryCard 
+                  categories={categories} 
+                  onCategoryClick={handleFilterChange} // Pass the click handler to CategoryCard
+                  selectedFilter={selectedFilter} // Highlight the selected filter
+                />
               </div>
             </motion.div>
 
@@ -101,7 +125,7 @@ const GrabMeals = () => {
               className="flex gap-5 justify-between flex-wrap mt-5"
               variants={itemVariants}
             >
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </motion.div>

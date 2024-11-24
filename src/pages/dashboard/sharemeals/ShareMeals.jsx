@@ -5,45 +5,23 @@ import Navbar from "../../../components/dashboard/Navbar";
 import { motion } from "framer-motion";
 import CardShareMeals from "../../../components/dashboard/sharemeals/CardShareMeals";
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const ShareMeals = () => {
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState([]);  
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get("http://localhost:8085/produk");
+      setProducts(response.data); // Perbarui state dengan data dari API
+    } catch (error) {
+      console.error("Gagal memuat produk:", error);
+      alert("Terjadi kesalahan saat memuat produk.");
+    }
   };
 
   useEffect(() => {
-    fetch('/productData.json')
-      .then((response) => response.json())
-      .then((data) => {
-        setProducts(data.filter((product) => product.category === 'Makanan'));
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching product data:', error);
-        setIsLoading(false);
-      });
+    fetchProducts(); // Muat data produk saat pertama kali render
   }, []);
 
   return (
@@ -76,38 +54,14 @@ const ShareMeals = () => {
                 variants={itemVariants}
               >
                 Produk yang anda bagikan
-              </motion.h2>
-
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {[...Array(4)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="h-64 bg-gray-200 rounded-xl animate-pulse"
-                      variants={itemVariants}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <motion.div
-                  className="flex justify-start flex-wrap gap-8"
-                  variants={containerVariants}
-                >
-                  {products.map((product) => (
-                    <motion.div
-                      key={product.id}
-                      variants={itemVariants}
-                      whileHover={{
-                        scale: 1.03,
-                        transition: { duration: 0.2 },
-                      }}
-                    >
-                      <CardShareMeals product={product} />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </motion.section>
+              </h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {products.map(product => (
+                  <CardShareMeals key={product.id} product={product} onDelete={fetchProducts} />
+                ))}
+              </div>
+            </section>
 
             {/* Floating Button */}
             <motion.div

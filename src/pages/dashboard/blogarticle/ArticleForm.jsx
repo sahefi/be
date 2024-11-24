@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import Navbar from '../../../components/dashboard/Navbar';
 import Sidebar from '../../../components/dashboard/Sidebar';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const ArticleForm = () => {
-
+const ArticleForm = () => {    
+    const user = JSON.parse(localStorage.getItem('user'));         
+    const navigate = useNavigate();
     const [showPreview, setShowPreview] = useState(false);
     const [previewData, setPreviewData] = useState(null);
 
@@ -91,25 +94,26 @@ const ArticleForm = () => {
         return isValid;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
+        
         e.preventDefault();
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"]');
         const errorMessage = document.getElementById('formError');
         const imagePreview = document.getElementById('imagePreview');
-
+    
         if (!validateForm(form)) {
             errorMessage.textContent = 'Mohon lengkapi semua field yang diperlukan';
             return;
         }
-
+    
         submitBtn.disabled = true;
         submitBtn.textContent = 'Uploading...';
         errorMessage.textContent = '';
-
+    
         // Get image URL from preview
         const imageUrl = imagePreview.querySelector('img')?.src || '';
-
+    
         // Set preview data
         setPreviewData({
             title: form.title.value,
@@ -118,13 +122,45 @@ const ArticleForm = () => {
             imageUrl: imageUrl
         });
         setShowPreview(true);
-
-        // Simulate successful upload
-        setTimeout(() => {
+    
+        // Create FormData
+        const formData = new FormData();
+        formData.append('judul', form.title.value);
+        formData.append('konten', form.content.value);
+        formData.append('kategori', form.category.value);
+        formData.append('id_user', user.id);
+    
+        // If image is uploaded, append it to FormData
+        const imageFile = form.image.files[0];
+        if (imageFile) {
+            formData.append('files', imageFile);
+        }
+    
+        try {
+            // Send the form data to the API using Axios
+            const response = await axios.post('http://localhost:8085/postingan', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+    
+            // Check if the response is successful
+            if (response.status === 201) {
+                // Simulate successful upload and show success message
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Upload Artikel';
+                    showSuccess('Artikel berhasil diupload!');
+                }, 1000);
+                navigate('/blog')
+            } else {
+                throw new Error('Failed to upload article');
+            }
+        } catch (error) {
+            errorMessage.textContent = 'Gagal mengunggah artikel, coba lagi!';
             submitBtn.disabled = false;
             submitBtn.textContent = 'Upload Artikel';
-            showSuccess('Artikel berhasil diupload!');
-        }, 1000);
+        }
     };
 
     return (

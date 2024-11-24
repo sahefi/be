@@ -1,38 +1,31 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import Axios
 import Sidebar from '../../components/dashboard/Sidebar';
 import Navbar from '../../components/dashboard/Navbar';
 
 const PaymentMethod = () => {
     const [isLoading, setIsLoading] = useState(false);
-
-    const navigate = useNavigate(); // Add this
-
-    // Add new state
+    const navigate = useNavigate(); 
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [invoiceNumber, setInvoiceNumber] = useState('');
 
-    // Add function to generate random invoice number
+    // Generate random invoice number
     const generateInvoiceNumber = () => {
         const date = new Date();
         const random = Math.floor(Math.random() * 10000);
         return `INV/${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate()}/${random}`;
     };
 
-
-
-
     const location = useLocation();
-    const { total } = location.state || {};
+    const { total, idUser, idProduk } = location.state || {};
 
-    // State untuk metode pembayaran yang dipilih
     const [selectedMethod, setSelectedMethod] = useState({
         method: "Mandiri Virtual Account",
         logo: "https://www.cdnlogo.com/logos/b/21/bank-mandiri.svg",
         code: "499207558109",
     });
 
-    // Daftar Virtual Account
     const virtualAccounts = [
         {
             method: "BCA Virtual Account",
@@ -51,7 +44,6 @@ const PaymentMethod = () => {
         },
     ];
 
-    // Daftar E-Wallet
     const eWallets = [
         {
             method: "Gopay",
@@ -65,27 +57,35 @@ const PaymentMethod = () => {
         },
     ];
 
-    // Fungsi untuk menangani perubahan metode pembayaran
     const handleSelectMethod = (method) => {
         setSelectedMethod(method);
     };
 
-    // Update handleConfirmPayment
-    const handleConfirmPayment = () => {
+    const handleConfirmPayment = async () => {
         setIsLoading(true);
-        // Simulate payment processing
-        setTimeout(() => {
-            setInvoiceNumber(generateInvoiceNumber());
-            // Clear the cart from localStorage after successful payment
-            localStorage.removeItem('cart');
-            setIsLoading(false);
-            setShowConfirmation(true);
-        }, 2000);
-    };
 
-    // Add function to handle payment completion
-    const handlePaymentComplete = () => {
-        navigate('/grab-meals'); // Redirect to dashboard after payment
+        const newInvoice = generateInvoiceNumber();
+        setInvoiceNumber(newInvoice);
+
+        const paymentData = {
+            id_user: idUser, // User ID from state
+            id_produk: idProduk, // Product ID from state
+            metode_pembayaran: selectedMethod.method,
+            jumlah_produk: 1, // Example quantity, update if dynamic
+            nomor_invoice: newInvoice,
+            total_harga: total, // Total price from state
+        };
+
+        try {
+            const response = await axios.post('http://localhost:8085/transaksi', paymentData); // Update API endpoint
+            console.log('Payment success:', response.data);
+            setShowConfirmation(true);
+        } catch (error) {
+            console.error('Payment failed:', error.response || error);
+            alert('Terjadi kesalahan saat memproses pembayaran.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -94,9 +94,22 @@ const PaymentMethod = () => {
 
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
-                    <Navbar showSearchBar={true} />
-                    <h1 className="mt-10 mx-10 text-2xl font-bold text-[#45c517]">Metode Bayar</h1>
-
+                    <Navbar showSearchBar={false} />
+                    <h1 className="mt-5 mx-10 text-2xl font-bold text-[#45c517]">Metode Bayar</h1>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="50"
+                        height="50"
+                        fill="currentColor"
+                        className="text-green-500 hover:cursor-pointer mx-10 bi bi-arrow-left-short"
+                        viewBox="0 0 16 16"
+                        onClick={() => window.history.back()}
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
+                        />
+                    </svg>
                     <section className="min-h-screen mx-10 my-5 ">
                         <div className="flex gap-5">
                             {/* Daftar Metode Pembayaran */}
@@ -128,7 +141,6 @@ const PaymentMethod = () => {
                                         </div>
                                     ))}
                                 </div>
-
                                 {/* E-Wallet Section */}
                                 <h1 className="mt-8 text-xl font-semibold text-[#45c517]">E-Wallet</h1>
                                 <div className="mt-5 space-y-3">
@@ -156,29 +168,16 @@ const PaymentMethod = () => {
                                         </div>
                                     ))}
                                 </div>
-
-                                <div className="pt-5 text-gray-600 text-sm">
-                                    <ul className="list-disc pl-5 space-y-2">
-                                        <li>Pembayaran Virtual Account hanya dapat dilakukan via Mobile Banking</li>
-                                        <li>Pastikan nominal pembayaran sudah sesuai dengan Total Harga transaksimu</li>
-                                        <li>
-                                            Setelah Anda melakukan pembayaran, mohon klik tombol konfirmasi pembayaran
-                                        </li>
-                                    </ul>
-                                </div>
                             </div>
 
                             {/* Detail Pembayaran */}
                             <div className="w-[40%] max-h-[340px] p-5 bg-white shadow-md rounded-xl space-y-5">
-                                {/* Total Harga Section */}
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-800">Total Harga</h2>
                                     <p className="text-xl font-bold text-black">
                                         Rp{total?.toLocaleString('id-ID')}
                                     </p>
                                 </div>
-
-                                {/* Kode Bayar Section */}
                                 <div className="mb-5">
                                     <h2 className="text-lg font-semibold text-gray-800">Kode Bayar</h2>
                                     <div className="flex items-center gap-3 mt-5">
@@ -204,13 +203,12 @@ const PaymentMethod = () => {
                                         </button>
                                     </div>
                                 </div>
-
                                 <div
                                     onClick={!isLoading ? handleConfirmPayment : undefined}
                                     className={`${isLoading
                                         ? 'bg-gray-400 cursor-not-allowed'
                                         : 'hover:cursor-pointer hover:bg-green-600 bg-[#45c517]'
-                                        } p-1 py-2 text-center rounded-full max-w-xs mx-auto`} // Added max-w-xs and mx-auto
+                                        } p-1 py-2 text-center rounded-full`}
                                 >
                                     {isLoading ? (
                                         <div className="flex items-center justify-center gap-2">
@@ -249,7 +247,6 @@ const PaymentMethod = () => {
                     </section>
                 </div>
 
-                {/* Payment Success Popup */}
                 {showConfirmation && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-xl p-8 w-[400px] text-center">
@@ -267,7 +264,7 @@ const PaymentMethod = () => {
                             <button
                                 onClick={() => {
                                     setShowConfirmation(false);
-                                    handlePaymentComplete(); // Note: added parentheses to call the function
+                                    navigate(-1);
                                 }}
                                 className="bg-[#45c517] text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300"
                             >

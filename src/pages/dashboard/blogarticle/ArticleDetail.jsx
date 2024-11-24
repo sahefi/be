@@ -1,15 +1,34 @@
 import { useParams } from "react-router-dom";
-import articles from "../../../assets/blogarticle/articleData.json";
+import axios from "axios";
+import { useState, useEffect } from "react";
 import Sidebar from "../../../components/dashboard/Sidebar";
 import Navbar from "../../../components/dashboard/Navbar";
 import MiniCardArticle from "../../../components/dashboard/article/MiniCardArticle";
 
 const ArticleDetail = () => {
-    const { id } = useParams();
-    const article = articles.find(article => article.id === parseInt(id, 10));
+    const { id } = useParams();  
+    const [article, setArticle] = useState(null);  
+    const [loading, setLoading] = useState(true);  
+
+    useEffect(() => {
+        
+        axios.get(`http://localhost:8085/postingan/${id}`)
+            .then((response) => {
+                setArticle(response.data);  
+                setLoading(false);  
+            })
+            .catch((error) => {
+                console.error("Error fetching article:", error);
+                setLoading(false);  
+            });
+    }, [id]);  
+
+    if (loading) {
+        return <div>Loading...</div>;  
+    }
 
     if (!article) {
-        return <div>Artikel tidak ditemukan</div>;
+        return <div>Artikel tidak ditemukan</div>;  
     }
 
     return (
@@ -25,26 +44,28 @@ const ArticleDetail = () => {
                         <div className="flex gap-5 relative">
                             {/* Main Article Content - Scrollable */}
                             <div className="p-8 rounded-md bg-white shadow-md w-[70%]">
-                                <p className="text-2xl font-bold">{article.title}</p>
+                                <p className="text-2xl font-bold">{article.judul}</p>
                                 <div className="flex gap-3 items-center my-3">
                                     <img
                                         className="rounded-full border-2 border-[#45c517] w-8 h-8 object-cover"
-                                        src={article.author_profile}
-                                        alt={article.author_name}
+                                        src={article?.user?.avatar || '../../../../public/profile.png'} // Gunakan default avatar jika avatar kosong
+                                        alt={article?.user?.nama_user || "User"}
                                     />
                                     <div>
-                                        <p className="font-semibold">{article.author_name}</p>
-                                        <span className="text-xs">{article.read_min} | {article.created_at}</span>
+                                        <p className="font-semibold">{article?.user?.user || "User"}</p>
+                                        <span className="text-xs">                                            
+                                            {new Date(article.createdAt).toLocaleDateString()}
+                                        </span>
                                     </div>
                                 </div>
                                 <div>
                                     <img
                                         className="w-full h-80 object-cover block"
-                                        src={article.img_content}
-                                        alt={article.title}
+                                        src={article.filename ? article.filename[0] : "default-image.png"}  // Menampilkan gambar pertama
+                                        alt={article.judul}
                                     />
                                     <p className="mt-5 text-md whitespace-pre-wrap">
-                                        {article.content}
+                                        {article.konten}
                                     </p>
                                 </div>
                             </div>

@@ -1,14 +1,23 @@
 import { motion } from "framer-motion";
 import Sidebar from "../../components/dashboard/Sidebar";
 import Navbar from "../../components/dashboard/Navbar";
-import userData from "../../assets/user/userData.json";
-import { useState } from "react";
+import { useState, useEffect } from 'react';
 import HistoryCard from "../../components/dashboard/profile/HistoryCard";
 import NoData from "../../components/dashboard/profile/NoData";
 import { Link } from "react-router-dom";
 
 const Profile = () => {
-    const [selectedNav, setSelectedNav] = useState("Riwayat Grab Meals");
+    const user = JSON.parse(localStorage.getItem('user'));   
+    const [profile, setProfile] = useState({});
+
+    // Memperbarui profile hanya saat komponen pertama kali dipasang (mount)
+    useEffect(() => {
+        if (user) {
+            setProfile(user);
+        }
+    }, [user]);  // Dependensi kosong memastikan efek ini hanya dijalankan sekali
+
+    const [selectedNav, setSelectedNav] = useState('Riwayat Grab Meals');
 
     const handleNavClick = (nav) => {
         setSelectedNav(nav);
@@ -20,7 +29,7 @@ const Profile = () => {
 
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
-                    <Navbar showSearchBar={true} />
+                    <Navbar showSearchBar={false} />
 
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
@@ -34,36 +43,14 @@ const Profile = () => {
                     </motion.div>
 
                     {/* content */}
-                    <motion.section 
-                        className="mx-10 my-5"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                    >
+                    <section className="mx-10 my-5">
                         <div className="p-5 min-h-screen w-full bg-white shadow-md rounded-xl">
-                            <motion.div 
-                                className="flex flex-col items-center text-center justify-center"
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.5, delay: 0.3 }}
-                            >
-                                <img
-                                    className="w-36 h-36 object-cover rounded-full shadow-md transform transition-transform duration-300 hover:scale-110"
-                                    src={userData.user.image_url}
-                                    alt=""
-                                />
-                                <h1 className="mt-3 text-2xl font-semibold">
-                                    {userData.user.name}
-                                </h1>
-                                <p className="text-[#45c517]">{userData.user.location}</p>
+                            <div className="flex flex-col items-center text-center justify-center">
+                                <img className="w-36 h-36 object-cover rounded-full" src={profile?.avatar || '../../../../public/profile.png'} alt="" />
+                                <h1 className="mt-3 text-2xl font-semibold">{profile?.nama_user || 'User'}</h1>
+                                <p className="text-[#45c517]">{profile?.alamat || 'Malang, Indonesia'}</p>
                                 <Link to="/profil/edit-profil">
-                                    <motion.button 
-                                        className="bg-[#45c517] hover:bg-[#3db314] font-semibold mt-5 py-2 px-3 rounded-full text-white transition-all"
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        Edit Profile
-                                    </motion.button>
+                                    <button className="bg-[#45c517] font-semibold mt-5 py-2 px-3 rounded-full text-white">Edit Profile</button>
                                 </Link>
                             </motion.div>
 
