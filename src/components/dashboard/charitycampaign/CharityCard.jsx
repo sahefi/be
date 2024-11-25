@@ -7,7 +7,7 @@ const CharityCard = ({ id, name, location, image_url, campaign }) => {
   const progress = (collected / target) * 100;
 
   return (
-    <div className="bg-white w-64 shadow-lg pb-10 flex flex-col p-4 rounded-lg">
+    <div className="bg-white w-64 shadow-lg pb-10 flex flex-col p-4 rounded-xl">
       {/* Card Content */}
       <img
         src={campaign_image_url}

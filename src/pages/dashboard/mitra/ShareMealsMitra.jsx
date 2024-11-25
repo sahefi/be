@@ -1,14 +1,13 @@
-// ShareMeals.jsx
-import { useEffect, useState } from 'react';
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Navbar from "../../../components/dashboard/Navbar";
+import { useState } from "react";
+import SidebarMitra from "../../../components/dashboard/mitra/SidebarMitra";
+import NavbarMitra from "../../../components/dashboard/mitra/NavbarMitra";
 import { motion } from "framer-motion";
-import CardShareMeals from "../../../components/dashboard/sharemeals/CardShareMeals";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import ShareMealsCardMitra from "../../../components/dashboard/mitra/ShareMealsCardMitra";
+import productMitra from '../../../assets/user/productMitra.json';
 
-const ShareMeals = () => {
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const ShareMealsMitra = () => {
+  const [products] = useState(productMitra);
 
   // Animation variants
   const containerVariants = {
@@ -33,27 +32,13 @@ const ShareMeals = () => {
     },
   };
 
-  useEffect(() => {
-    fetch('/productData.json')
-      .then((response) => response.json())
-      .then((data) => {
-        setProducts(data.filter((product) => product.category === 'Makanan'));
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching product data:', error);
-        setIsLoading(false);
-      });
-  }, []);
-
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar without animation */}
-      <Sidebar />
+      <SidebarMitra />
 
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
-          <Navbar />
+          <NavbarMitra />
 
           <motion.div
             className="p-10"
@@ -78,35 +63,23 @@ const ShareMeals = () => {
                 Produk yang anda bagikan
               </motion.h2>
 
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {[...Array(4)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="h-64 bg-gray-200 rounded-xl animate-pulse"
-                      variants={itemVariants}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <motion.div
-                  className="flex justify-start flex-wrap gap-8"
-                  variants={containerVariants}
-                >
-                  {products.map((product) => (
-                    <motion.div
-                      key={product.id}
-                      variants={itemVariants}
-                      whileHover={{
-                        scale: 1.03,
-                        transition: { duration: 0.2 },
-                      }}
-                    >
-                      <CardShareMeals product={product} />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
+              <motion.div
+                className="flex justify-start flex-wrap gap-8"
+                variants={containerVariants}
+              >
+                {products.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    variants={itemVariants}
+                    whileHover={{
+                      scale: 1.03,
+                      transition: { duration: 0.2 },
+                    }}
+                  >
+                    <ShareMealsCardMitra product={product} />
+                  </motion.div>
+                ))}
+              </motion.div>
             </motion.section>
 
             {/* Floating Button */}
@@ -141,4 +114,4 @@ const ShareMeals = () => {
   );
 };
 
-export default ShareMeals;
+export default ShareMealsMitra;

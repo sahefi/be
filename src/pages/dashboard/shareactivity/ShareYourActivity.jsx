@@ -95,7 +95,7 @@ const ShareYourActivity = () => {
                                 <div className="flex justify-end gap-2">
                                     <button
                                         onClick={toggleModal}
-                                        className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                                        className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full"
                                     >
                                         Batal
                                     </button>

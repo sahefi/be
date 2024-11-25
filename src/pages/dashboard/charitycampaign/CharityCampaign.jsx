@@ -25,7 +25,7 @@ const CharityCampaign = () => {
               </button>
             </Link>
 
-            <div className="flex flex-wrap gap-10">
+            <div className="flex flex-wrap justify-even gap-10">
               {charityData.map((lembaga) => (
                 <CharityCard
                   key={lembaga.id}

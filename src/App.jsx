@@ -30,6 +30,11 @@ import BlogArticleVerif from './pages/dashboard/admin/blogartikel/BlogArticleVer
 import ArticleVerifDetail from './pages/dashboard/admin/blogartikel/ArticleVerifDetail';
 import AccountDetailVerif from './components/dashboard/admin/AccountDetailVerif';
 import AccountList from './pages/dashboard/admin/AccountList';
+
+import DashboardMitra from './pages/dashboard/mitra/DashboardMitra';
+import ShareMealsMitra from './pages/dashboard/mitra/ShareMealsMitra';
+import UpdateProductMitra from './pages/dashboard/mitra/UpdateProductMitra';
+
 const App = () => {
   return (
     <div>
@@ -68,6 +73,11 @@ const App = () => {
           <Route path="/article-verif" element={<BlogArticleVerif />} />
           <Route path="/article-detail-verif/:id" element={<ArticleVerifDetail />} />
           <Route path="/account-verif/:id" element={<AccountDetailVerif />} />
+
+          <Route path="/mitra" element={<DashboardMitra />} />
+          <Route path="/sharemeals-mitra" element={<ShareMealsMitra />} />
+          <Route path="/mitra/update-product/:id" element={<UpdateProductMitra />} />
+
         </Routes>
       </Router>
 
