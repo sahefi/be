@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Navbar from "../../../components/dashboard/Navbar";
+import SidebarMitra from "../../../components/dashboard/mitra/SidebarMitra";
+import NavbarMitra from "../../../components/dashboard/mitra/NavbarMitra";
 import kotaData from "../../../assets/sharemeals/kotaData.json";
 import productMitra from "../../../assets/user/productMitra.json";
 import categoryList from '../../../../public/categoryList.json';  // Adjust path as needed
@@ -169,26 +169,13 @@ const UpdateProductMitra = () => {
     if (errorMessage) return <div className="flex justify-center items-center min-h-screen text-red-500">{errorMessage}</div>;
     return (
         <div className="flex min-h-screen">
-            <Sidebar />
+            <SidebarMitra />
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
-                    <Navbar />
+                    <NavbarMitra />
                     <div className="mt-5 mx-10">
                         <h1 className="text-[#45c517] text-2xl font-bold">Bagikan Produk</h1>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="50"
-                            height="50"
-                            fill="currentColor"
-                            className="text-green-500 hover:cursor-pointer"
-                            viewBox="0 0 16 16"
-                            onClick={() => navigate(-1)}
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
-                            />
-                        </svg>
+                       
 
                         <section className="p-3 rounded-md bg-white shadow-md mt-5">
                             <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Informasi Produk dan Pengambilan</h1>

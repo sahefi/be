@@ -79,14 +79,14 @@ const AccountDetailVerif = () => {
 
                                 {/* Location Information */}
                                 <div className="border-t pt-6">
-                                    <h3 className="text-xl font-semibold mb-4">Informasi Lokasi</h3>
+                                    <h3 className="text-xl font-semibold mb-4">Informasi Lokasi </h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-gray-600">Lokasi</p>
+                                            <p className="text-gray-600">Lokasi Lembaga/Mitra</p>
                                             <p className="font-medium">{userData.location}</p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-600">Alamat</p>
+                                            <p className="text-gray-600">Alamat Lembaga/Mitra</p>
                                             <p className="font-medium">{userData.address}</p>
                                         </div>
                                     </div>
@@ -94,14 +94,14 @@ const AccountDetailVerif = () => {
 
                                 {/* Business Information */}
                                 <div className="border-t pt-6">
-                                    <h3 className="text-xl font-semibold mb-4">Informasi Perusahaan</h3>
+                                    <h3 className="text-xl font-semibold mb-4">Informasi Lembaga/Mitra</h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-gray-600">Nama Pendiri</p>
+                                            <p className="text-gray-600">Nama Pemilik Usaha</p>
                                             <p className="font-medium">{userData.nama_pendiri}</p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-600">Nomor Rekening</p>
+                                            <p className="text-gray-600">Nomor Rekening Perusahaan</p>
                                             <p className="font-medium">{userData.nomor_rekening_perusahaan}</p>
                                         </div>
                                     </div>
@@ -109,15 +109,27 @@ const AccountDetailVerif = () => {
 
                                 {/* Description */}
                                 <div className="border-t pt-6">
-                                    <h3 className="text-xl font-semibold mb-4">Deskripsi</h3>
+                                    <h3 className="text-xl font-semibold mb-4">Deskripsi Lembaga/Mitra</h3>
                                     <p className="text-gray-700 whitespace-pre-line">
                                         {userData.deskripsi}
                                     </p>
                                 </div>
 
+                                {/* foto kantor */}
+                                <div className='w-full border-t pt-5'>
+                                    <h3 className="text-xl font-semibold mb-4">Foto Lembaga/Mitra</h3>
+                                    <div className="flex justify-center">
+                                        <img
+                                            alt="Foto Kantor"
+                                            className="w-3/4 h-72 rounded-xl object-cover rounded"
+                                            src={userData.foto_kantor}
+                                        />
+                                    </div>
+                                </div>
+
                                 {/* Documents */}
                                 <div className="border-t pt-6">
-                                    <h3 className="text-xl font-semibold mb-4">Dokumen</h3>
+                                    <h3 className="text-xl font-semibold mb-4">Dokumen Lembaga/Mitra</h3>
                                     <div className="border p-4 rounded-lg">
                                         <p className="text-gray-600 mb-2">Surat Izin</p>
                                         <img
@@ -143,6 +155,8 @@ const AccountDetailVerif = () => {
                                         Terima Verifikasi
                                     </button>
                                 </div>
+
+
                             </div>
                         ) : (
                             <div className="text-center py-8">

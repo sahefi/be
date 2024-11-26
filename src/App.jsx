@@ -34,6 +34,11 @@ import AccountList from './pages/dashboard/admin/AccountList';
 import DashboardMitra from './pages/dashboard/mitra/DashboardMitra';
 import ShareMealsMitra from './pages/dashboard/mitra/ShareMealsMitra';
 import UpdateProductMitra from './pages/dashboard/mitra/UpdateProductMitra';
+import ProfileMitra from './pages/dashboard/mitra//ProfileMitra';
+import EditProfilMitra from './pages/dashboard/mitra/EditProfilMitra';
+import ShareMealsFormMitra from './pages/dashboard/mitra/ShareMealsFormMitra';
+
+import AccountVerifForm from './pages/dashboard/AccountVerifForm';
 
 const App = () => {
   return (
@@ -74,10 +79,14 @@ const App = () => {
           <Route path="/article-detail-verif/:id" element={<ArticleVerifDetail />} />
           <Route path="/account-verif/:id" element={<AccountDetailVerif />} />
 
+          <Route path="/edit-profil-mitra" element={<EditProfilMitra />} />
           <Route path="/mitra" element={<DashboardMitra />} />
           <Route path="/sharemeals-mitra" element={<ShareMealsMitra />} />
+          <Route path="/sharemeals-form-mitra" element={<ShareMealsFormMitra />} />
+          <Route path="/profile-mitra" element={<ProfileMitra />} />
           <Route path="/mitra/update-product/:id" element={<UpdateProductMitra />} />
 
+          <Route path="/verif-form" element={<AccountVerifForm/>} />
         </Routes>
       </Router>
 

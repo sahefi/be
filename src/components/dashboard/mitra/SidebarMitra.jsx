@@ -2,18 +2,19 @@ import { Link, useLocation } from 'react-router-dom';
 
 const SidebarMitra = () => {
     const location = useLocation();
+
     const isActive = (patterns) => {
         const pathArray = Array.isArray(patterns) ? patterns : [patterns];
-        return pathArray.some(pattern =>
-            location.pathname === pattern ||
-            location.pathname.startsWith(`${pattern}/`)
-        );
+        return pathArray.some(pattern => {
+            // Cocok secara eksak atau pastikan awalan diikuti dengan "/"
+            return location.pathname === pattern || location.pathname.startsWith(`${pattern}/`);
+        });
     };
 
     const ROUTE_PATTERNS = {
-        HOME: ['/mitra'],
-        SHARE_MEALS: ['/sharemeals-mitra', '/share-meals-form'],
-      
+        HOME: ['/mitra','/verif-form'], // Cocok untuk halaman utama
+        SHARE_MEALS: ['/sharemeals-mitra', '/sharemeals-form-mitra'], // Cocok untuk halaman berbagi makanan
+        PROFILE: ['/profile-mitra','/edit-profil-mitra'] // Cocok hanya untuk halaman profil
     };
 
     return (
@@ -25,9 +26,8 @@ const SidebarMitra = () => {
                     </h1>
                 </Link>
 
-
                 <ul className="text-md flex flex-col gap-3 justify-between">
-                    
+
                     <div className='text-md flex flex-col gap-3'>
                         {/* Home Link */}
                         <Link to="/mitra" className={`flex items-center gap-2 px-2 py-3 hover:bg-[#47cb18] hover:text-white rounded-md ${isActive(ROUTE_PATTERNS.HOME) ? 'bg-[#47cb18] text-white' : 'text-gray'}`}>
@@ -37,8 +37,6 @@ const SidebarMitra = () => {
                             <h1>Home</h1>
                         </Link>
 
-            
-
                         {/* Share Meals Link */}
                         <Link to="/sharemeals-mitra" className={`flex items-center gap-2 px-2 py-3 hover:bg-[#47cb18] hover:text-white rounded-md ${isActive(ROUTE_PATTERNS.SHARE_MEALS) ? 'bg-[#47cb18] text-white' : 'text-gray'}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-share" viewBox="0 0 16 16">
@@ -46,13 +44,10 @@ const SidebarMitra = () => {
                             </svg>
                             <h1>Share Meals</h1>
                         </Link>
-
-        
-                    
-                       
                     </div>
 
-                    <Link to="/profile" className={`flex items-center gap-2 px-2 py-3 hover:bg-[#47cb18] hover:text-white rounded-md ${isActive('/profile') ? 'bg-[#47cb18] text-white' : 'text-gray'}`}>
+                    {/* Profile Link */}
+                    <Link to="/profile-mitra" className={`flex items-center gap-2 px-2 py-3 hover:bg-[#47cb18] hover:text-white rounded-md ${isActive(ROUTE_PATTERNS.PROFILE) ? 'bg-[#47cb18] text-white' : 'text-gray'}`}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-circle" viewBox="0 0 16 16">
                             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
                             <path fillRule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from "../../dashboard/Sidebar";
 import Navbar from "../../dashboard/Navbar";
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 const DetailProduct = () => {
   const [product, setProduct] = useState(null);
@@ -9,7 +11,17 @@ const DetailProduct = () => {
   const [total, setTotal] = useState(0);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('description'); // New state for active tab
 
+  const tabVariants = {
+    inactive: { width: 0, opacity: 0 },
+    active: { width: '100%', opacity: 1, transition: { duration: 0.3 } }
+  };
+
+  const contentVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+  };
 
   function handleQuantityChange(currentQty, stock, isIncrease, price) {
     let newQty;
@@ -40,13 +52,13 @@ const DetailProduct = () => {
   };
 
   const handlePurchase = () => {
-    navigate(`/payment/${product.id}`, { 
-        state: { 
-            total,
-            quantity // Pass quantity state to GrandProduct
-        } 
+    navigate(`/payment/${product.id}`, {
+      state: {
+        total,
+        quantity // Pass quantity state to GrandProduct
+      }
     });
-};
+  };
 
 
   useEffect(() => {
@@ -77,11 +89,11 @@ const DetailProduct = () => {
       owner: product.owner,
       photoProfile: product.photoProfile
     };
-  
+
     try {
       const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
       const existingItemIndex = existingCart.findIndex(item => item.id === product.id);
-  
+
       if (existingItemIndex !== -1) {
         const newQuantity = existingCart[existingItemIndex].quantity + quantity;
         existingCart[existingItemIndex].quantity = newQuantity;
@@ -89,9 +101,9 @@ const DetailProduct = () => {
       } else {
         existingCart.push(cartItem);
       }
-  
+
       localStorage.setItem('cart', JSON.stringify(existingCart));
-  
+
       const messageElement = document.getElementById('success-message');
       if (messageElement) {
         messageElement.classList.remove('hidden');
@@ -107,27 +119,15 @@ const DetailProduct = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <section className="bg-[#f4fef1] pl-60 pt-20">
+      <section className="bg-[#f4fef1] w-full  pl-60 pt-20">
         <div className="mt-5 flex-grow">
           <Navbar showSearchBar={true} />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="50"
-            height="50"
-            fill="currentColor"
-            className="text-green-500 hover:cursor-pointer mx-10 bi bi-arrow-left-short"
-            viewBox="0 0 16 16"
-            onClick={() => window.history.back()}
-          >
-            <path
-              fillRule="evenodd"
-              d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
-            />
-          </svg>
-
-          <section className="min-h-screen mx-10">
-            <div className="flex mt-5 gap-5 justify-between">
-              <div className="flex gap-10 p-5 shadow-md w-[70%] rounded-xl min-h-96 bg-white">
+         
+          <section className="min-h-screen  mx-10">
+            <div className=" flex mt-5 gap-5 justify-between">
+              
+              <div className="mt-10 flex gap-10 p-5 shadow-md w-[650px] rounded-xl min-h-96 bg-white">
+              
                 {/* Product */}
                 <div className="flex flex-col min-w-48 gap-5">
                   <img
@@ -144,7 +144,8 @@ const DetailProduct = () => {
                     <p className="text-xs font-semibold">{product.owner}</p>
                   </div>
                 </div>
-                <div>
+
+                <div className="flex flex-col gap-4 w-full">
                   <h1 className="text-3xl font-bold mb-2">{product.productName}</h1>
                   <h3 className="text-2xl font-bold mb-2">
                     Rp{Number(product.price).toLocaleString('id-ID')}
@@ -152,20 +153,73 @@ const DetailProduct = () => {
                   <h1 className="bg-[#e2f7db] text-xs rounded text-center w-28 py-1 mb-4">
                     Hingga : {product.timeOver} WIB
                   </h1>
-                  <p className="text-lg text-[#47cb18] mt-20 mb-4">Deskripsi</p>
-                  <div className="flex flex-col mb-4">
-                    <h1 className="font-bold text-xs">Detail Produk</h1>
-                    <p className="text-xs">{product.category}</p>
+
+                  {/* Tabs */}
+                  <div className='w-full flex gap-5  relative'>
+                    <button
+                      onClick={() => setActiveTab('description')}
+                      className={`text-md pb-2 relative ${activeTab === 'description' ? 'text-[#47cb18] font-bold' : 'text-gray-500'
+                        }`}
+                    >
+                      Deskripsi
+                      {activeTab === 'description' && (
+                        <motion.div
+                          className="absolute bottom-0 left-0 h-0.5 bg-[#47cb18]"
+                          initial="inactive"
+                          animate="active"
+                          variants={tabVariants}
+                        />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('address')}
+                      className={`text-md pb-2 relative ${activeTab === 'address' ? 'text-[#47cb18] font-bold' : 'text-gray-500'
+                        }`}
+                    >
+                      Alamat
+                      {activeTab === 'address' && (
+                        <motion.div
+                          className="absolute bottom-0 left-0 h-0.5 bg-[#47cb18]"
+                          initial="inactive"
+                          animate="active"
+                          variants={tabVariants}
+                        />
+                      )}
+                    </button>
                   </div>
-                  <div className="flex flex-col">
-                    <h1 className="font-bold text-xs">Deskripsi Produk</h1>
-                    <p className="text-xs">{product.description}</p>
-                  </div>
+
+                  {/* Content based on active tab */}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeTab}
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={contentVariants}
+                    >
+                      {activeTab === 'description' && (
+                        <div className="flex max-w-screen flex-col mb-4">
+                          <h1 className="font-bold text-sm mb-2">Detail Produk</h1>
+                          <p className="text-sm mb-4">{product.category}</p>
+                          <h1 className="font-bold text-sm mb-2">Deskripsi Produk</h1>
+                          <p className="text-sm">{product.description}</p>
+                        </div>
+                      )}
+
+                      {activeTab === 'address' && (
+                        <div className="flex flex-col mb-4">
+                          <h1 className="font-bold text-sm mb-2">Lokasi Pengambilan</h1>
+                          <p className="text-sm">{product.address}</p>
+                        </div>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
               </div>
 
+
               {/* Payment */}
-              <div className="flex-1 max-h-64 rounded-xl p-5 bg-white shadow-md flex flex-col">
+              <div className="mt-10 flex-1 max-h-64 rounded-xl p-5 bg-white shadow-md flex flex-col">
                 <h1 className="font-bold text-lg mb-4">Jumlah pembelian</h1>
 
                 {/* Quantity Control */}
@@ -217,15 +271,15 @@ const DetailProduct = () => {
                   id="success-message"
                   className="hidden text-green-600 text-xs pt-2 mt-2 transition-all duration-300"
                 >
-                Berhasil ditambahkan ke keranjang
+                  Berhasil ditambahkan ke keranjang
                 </p>
 
               </div>
             </div>
           </section>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 };
 

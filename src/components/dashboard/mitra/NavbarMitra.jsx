@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import adminData from '../../../assets/user/adminData.json';
 import { FaSearch } from "react-icons/fa";
 import { Link } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
 import mitraData from '../../../assets/user/mitraData.json';
+import Notifikasi from '../PopNotifikasi';
 
 const NavbarMitra = ({ showSearchBar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,7 +12,26 @@ const NavbarMitra = ({ showSearchBar }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const [showNotification, setShowNotification] = useState(false);
 
+  const toggleNotification = () => {
+    setShowNotification(!showNotification);
+
+    // Mark all notifications as read
+    setUnreadNotifications(prevState => prevState.map(() => false));
+  };
+
+  // State for unread notifications
+  const [unreadNotifications, setUnreadNotifications] = useState([true, true, true, true]);
+
+  // Mark notification as read when clicked
+  const markAsRead = (index) => {
+    setUnreadNotifications(prevState => {
+      const updatedNotifications = [...prevState];
+      updatedNotifications[index] = false;
+      return updatedNotifications;
+    });
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -48,25 +66,39 @@ const NavbarMitra = ({ showSearchBar }) => {
         <h1 className='text-xl font-semibold'>Welcome, {mitraData.name}!</h1>
       )}
 
-      <ul className=" flex items-center gap-5">
+      <ul className="flex items-center gap-5">
+        {/* Notification icon with dropdown */}
+        <div className="relative">
+          <button
+            onClick={toggleNotification}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="gray"
+              className="cursor-pointer"
+            >
+              <path d="M18 10C18 6.68629 15.3137 4 12 4C8.68629 4 6 6.68629 6 10V18H18V10ZM20 18.6667L20.4 19.2C20.5657 19.4209 20.5209 19.7343 20.3 19.9C20.2135 19.9649 20.1082 20 20 20H4C3.72386 20 3.5 19.7761 3.5 19.5C3.5 19.3918 3.53509 19.2865 3.6 19.2L4 18.6667V10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10V18.6667ZM9.5 21H14.5C14.5 22.3807 13.3807 23.5 12 23.5C10.6193 23.5 9.5 22.3807 9.5 21Z" />
+            </svg>
+            {/* Unread notification indicator */}
+            {unreadNotifications.some(status => status) && (
+              <div className="absolute top-3 left-3   translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-red-500 rounded-full" />
+            )}
+          </button>
 
-        <NavLink
-          to="/cart"
-          className={({ isActive }) => `
-    hover:cursor-pointer 
-    hover:text-[#45c517] 
-    transition-colors 
-    duration-200 
-    ${isActive ? 'text-[#45c517]' : 'text-gray-500'}
-  `}
-        >
-         
-        </NavLink>
+          {/* Notification dropdown */}
+          <div
+          className={`absolute top-12 left-2 mt-2 w-72 z-1 transition-all duration-300 ${showNotification ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
+          >
+            <Notifikasi markAsRead={markAsRead} unreadNotifications={unreadNotifications} />
+          </div>
+        </div>
 
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="gray">
-          <path d="M18 10C18 6.68629 15.3137 4 12 4C8.68629 4 6 6.68629 6 10V18H18V10ZM20 18.6667L20.4 19.2C20.5657 19.4209 20.5209 19.7343 20.3 19.9C20.2135 19.9649 20.1082 20 20 20H4C3.72386 20 3.5 19.7761 3.5 19.5C3.5 19.3918 3.53509 19.2865 3.6 19.2L4 18.6667V10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10V18.6667ZM9.5 21H14.5C14.5 22.3807 13.3807 23.5 12 23.5C10.6193 23.5 9.5 22.3807 9.5 21Z"></path>
-        </svg>
 
+        {/* Dropdown menu */}
         <div className="flex items-center gap-2 relative" ref={dropdownRef}>
           <div className="border-2 border-[#45c517] rounded-full">
             <img
@@ -94,37 +126,37 @@ const NavbarMitra = ({ showSearchBar }) => {
             </svg>
           </div>
 
+          {/* Dropdown profile */}
           {isDropdownOpen && (
             <div className="absolute right-0 top-12 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
               <ul className="py-1">
-                <Link to="/profile">
-                  <li
-                    className="px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer"
-
+                <li>
+                  <Link
+                    to="/profile"
+                    className="block w-full px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer"
                   >
                     Profile
-                  </li>
-                </Link>
-
-                <li
-                  className="px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer"
-
-                >
-                  Help & Support
+                  </Link>
                 </li>
-                <Link to="/">
-                  <li
-                    className="px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer text-red-600"
-
+                <li>
+                  <a
+                    href="#"
+                    className="block w-full px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer"
+                  >
+                    Help & Support
+                  </a>
+                </li>
+                <li>
+                  <Link
+                    to="/"
+                    className="block w-full px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer text-red-600"
                   >
                     Logout
-                  </li>
-                </Link>
-
+                  </Link>
+                </li>
               </ul>
             </div>
           )}
-
 
         </div>
       </ul>

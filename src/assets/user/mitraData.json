@@ -10,5 +10,7 @@
     "phone_number": "081923456789",
     "role": "mitra",
     "id": 1,
-    "status": "accepted"
+    "status": "pending",
+    "nomor_rekening" : "235341241223",
+    "deskripsi" : "Oyi Buttermilk Chicken adalah restoran cepat saji di Malang yang menyajikan berbagai menu berbasis ayam dengan cita rasa khas buttermilk. Restoran ini menawarkan beragam hidangan seperti nasi ayam geprek, rice box dengan fillet ayam juicy, serta berbagai pilihan saus dan minuman. "
 }

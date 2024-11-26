@@ -14,6 +14,7 @@
         "nomor_rekening_perusahaan": "1234567890123456",
         "nama_pendiri": "Budi Santoso",
         "surat_izin": "https://example.com/suratizin.jpg",
+        "foto_kantor" :"https://al-kahfi.org/wp-content/uploads/2024/03/IMG_5838-scaled.jpg",
         "deskripsi": "Yayasan Kasih Ngawi adalah sebuah lembaga sosial yang bergerak di bidang sosial, yang berdiri sejak tahun 2000. Yayasan ini beranggotakan para relawan yang memiliki kepedulian tinggi terhadap sesama. Yayasan Kasih Ngawi memiliki beberapa program unggulan, diantaranya adalah program pemberian bantuan makanan, program pemberian bantuan pakaian, program pemberian bantuan pendidikan, dan program pemberian bantuan kesehatan. Yayasan Kasih Ngawi memiliki visi untuk membantu masyarakat yang membutuhkan, serta memberikan kontribusi positif bagi masyarakat sekitar. Yayasan Kasih Ngawi memiliki misi untuk memberikan bantuan kepada masyarakat yang membutuhkan, serta memberikan edukasi kepada masyarakat sekitar tentang pentingnya kepedulian terhadap sesama. Yayasan Kasih Ngawi memiliki motto 'Bersama Kita Bisa Membantu' yang menjadi pedoman bagi setiap anggota relawan."
     },
     {
@@ -31,6 +32,7 @@
         "nomor_rekening_perusahaan": "0000000000000000",
         "nama_pendiri": "Budi Hartono",
         "surat_izin": "https://example.com/suratizin_default.jpg",
+        "foto_kantor" : "https://foto.kontan.co.id/TQ-shkxDTKVKKHRxyUGanW9wac4=/smart/2022/07/05/1330876119p.jpg",
         "deskripsi": "Lembaga Bantuan Sosial Jakarta adalah sebuah lembaga yang bergerak dalam memberikan bantuan kepada masyarakat yang membutuhkan. Didirikan sejak tahun 2000, lembaga ini memiliki visi untuk menciptakan masyarakat yang lebih peduli dan inklusif."
     },
     {

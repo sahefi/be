@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import ShareMealsCardMitra from "../../../components/dashboard/mitra/ShareMealsCardMitra";
 import productMitra from '../../../assets/user/productMitra.json';
+import { FaShareAlt } from "react-icons/fa"; // Contoh ikon dari react-icons
+
 
 const ShareMealsMitra = () => {
   const [products] = useState(productMitra);
@@ -94,18 +96,22 @@ const ShareMealsMitra = () => {
                 delay: 0.5,
               }}
             >
-              <Link to="/share-meals/form">
+           
+
+              <Link to="/sharemeals-form-mitra">
                 <motion.button
-                  className="bg-[#47cb18] hover:bg-green-600 text-white px-8 py-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl"
+                  className="bg-[#47cb18] hover:bg-green-600 text-white px-8 py-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl flex items-center gap-2"
                   whileHover={{
                     scale: 1.05,
                     boxShadow: "0 10px 25px rgba(71, 203, 24, 0.3)",
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
+                  <FaShareAlt /> {/* Ikon ditambahkan di sini */}
                   Bagikan Produk
                 </motion.button>
               </Link>
+
             </motion.div>
           </motion.div>
         </div>

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const ShareMealsCardMitra = ({ product }) => {
   return (
-    <div className='hover:cursor-pointer w-52 bg-white shadow-md rounded-xl overflow-hidden'>
+    <div className='p-2 hover:cursor-pointer w-52 bg-white shadow-md rounded-xl overflow-hidden'>
       <img 
         className="object-cover w-full h-28" 
         src={product.image_url} 

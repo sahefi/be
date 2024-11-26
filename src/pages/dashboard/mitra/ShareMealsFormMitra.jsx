@@ -1,12 +1,12 @@
 // ShareMealsForm.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Navbar from "../../../components/dashboard/Navbar";
+import SidebarMitra from "../../../components/dashboard/mitra/SidebarMitra";
+import NavbarMitra from "../../../components/dashboard/mitra/NavbarMitra";
 import kotaData from "../../../assets/sharemeals/kotaData.json";
 import categoryList from "../../../../public/categoryList.json";
 
-const ShareMealsForm = () => {
+const ShareMealsFormMitra = () => {
   const navigate = useNavigate();
 
   // State untuk form
@@ -87,14 +87,13 @@ const ShareMealsForm = () => {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <SidebarMitra />
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
-          <Navbar />
+          <NavbarMitra />
           <div className="mt-5 mx-10">
             <h1 className="text-[#45c517] text-2xl font-bold">Bagikan Produk</h1>
            
-
             <section className="p-3 rounded-md bg-white shadow-md mt-5">
               <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Informasi Produk dan Pengambilan</h1>
               <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
@@ -321,4 +320,4 @@ const ShareMealsForm = () => {
   );
 };
 
-export default ShareMealsForm;
+export default ShareMealsFormMitra;
