@@ -6,7 +6,9 @@ import { useRef, useState } from 'react';
 const EditProfil = () => {
     const [profileImage, setProfileImage] = useState(mitraData.phone_number);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useRef(null);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const handleUploadClick = () => {
         fileInputRef.current.click();
@@ -82,7 +84,17 @@ const EditProfil = () => {
                                 </div>
                             </div>
 
-                            <form className="mt-5 " action="">
+                            <form className="mt-5" onSubmit={async (e) => {
+                                e.preventDefault();
+                                setIsSaving(true);
+                                setShowSuccess(false);
+                                // Simulate API call
+                                await new Promise(resolve => setTimeout(resolve, 1500));
+                                setIsSaving(false);
+                                setShowSuccess(true);
+                                // Hide success message after 3 seconds
+                                setTimeout(() => setShowSuccess(false), 3000);
+                            }}>
                                 <div className="flex flex-col gap-3 py-3 border-t border-b border-gray-200">
                                     <label
                                         className="font-semibold text-sm text-gray-700"
@@ -275,16 +287,35 @@ const EditProfil = () => {
                                     </div>
                                 </div>
 
-                                <button className="mt-5 bg-[#45c517] px-3 py-1 rounded-full text-white">Simpan Perubahan</button>
+                                <div className="flex justify-end mt-5 items-center gap-4">
+                                    {showSuccess && (
+                                        <span className="text-[#45c517] text-sm font-medium">
+                                            Perubahan berhasil disimpan
+                                        </span>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        className="rounded-full text-white px-6 py-2 bg-[#45c517] text-sm font-semibold hover:bg-green-600 transition duration-300"
+                                    >
+                                        Simpan Perubahan
+                                    </button>
+                                </div>
+
                             </form>
-
-
                         </section>
-
                     </section>
                 </div>
             </section>
 
+            {/* Loading Popup */}
+            {isSaving && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#45c517] border-t-transparent mb-3"></div>
+                        <p className="text-gray-700">Menyimpan perubahan...</p>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
