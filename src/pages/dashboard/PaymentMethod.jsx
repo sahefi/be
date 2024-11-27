@@ -76,9 +76,16 @@ const PaymentMethod = () => {
         // Simulate payment processing
         setTimeout(() => {
             setInvoiceNumber(generateInvoiceNumber());
+            // Clear the cart from localStorage after successful payment
+            localStorage.removeItem('cart');
             setIsLoading(false);
             setShowConfirmation(true);
         }, 2000);
+    };
+
+    // Add function to handle payment completion
+    const handlePaymentComplete = () => {
+        navigate('/grab-meals'); // Redirect to dashboard after payment
     };
 
     return (
@@ -89,20 +96,7 @@ const PaymentMethod = () => {
                 <div className="flex-grow">
                     <Navbar showSearchBar={true} />
                     <h1 className="mt-5 mx-10 text-2xl font-bold text-[#45c517]">Metode Bayar</h1>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="50"
-                        height="50"
-                        fill="currentColor"
-                        className="text-green-500 hover:cursor-pointer mx-10 bi bi-arrow-left-short"
-                        viewBox="0 0 16 16"
-                        onClick={() => window.history.back()}
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
-                        />
-                    </svg>
+                   
                     <section className="min-h-screen mx-10 my-5 ">
                         <div className="flex gap-5">
                             {/* Daftar Metode Pembayaran */}
@@ -215,8 +209,8 @@ const PaymentMethod = () => {
                                 <div
                                     onClick={!isLoading ? handleConfirmPayment : undefined}
                                     className={`${isLoading
-                                            ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'hover:cursor-pointer hover:bg-green-600 bg-[#45c517]'
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'hover:cursor-pointer hover:bg-green-600 bg-[#45c517]'
                                         } p-1 py-2 text-center rounded-full`}
                                 >
                                     {isLoading ? (
@@ -274,7 +268,7 @@ const PaymentMethod = () => {
                             <button
                                 onClick={() => {
                                     setShowConfirmation(false);
-                                    navigate(-1); // Navigate back to the previous page
+                                    handlePaymentComplete(); // Note: added parentheses to call the function
                                 }}
                                 className="bg-[#45c517] text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300"
                             >

@@ -13,7 +13,7 @@ const ShareMealsCardMitra = ({ product }) => {
         <h3 className="font-semibold text-lg mb-2 truncate">{product.productName}</h3>
         <p className="text-sm mb-4">Sisa Stok: <span className="text-[#45c517]">{product.stok}</span></p>
         <div className="flex justify-between gap-2">
-          <Link to={`/mitra/update-product/${product.id}`} className="flex-1">
+          <Link to={`/update-product/${product.id}`} className="flex-1">
             <button className="w-full duration-300 transition hover:bg-green-600 bg-[#45c517] text-white py-1 rounded-full">
               Edit
             </button>

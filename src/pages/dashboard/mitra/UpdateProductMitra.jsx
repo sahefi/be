@@ -175,17 +175,61 @@ const UpdateProductMitra = () => {
                     <NavbarMitra />
                     <div className="mt-5 mx-10">
                         <h1 className="text-[#45c517] text-2xl font-bold">Bagikan Produk</h1>
-                       
 
                         <section className="p-3 rounded-md bg-white shadow-md mt-5">
                             <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Informasi Produk dan Pengambilan</h1>
-                            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+                            <form className="space-y-6" onSubmit={handleSubmit}>
+                                {/* Foto Produk */}
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Foto Produk</label>
+                                    <div className="mt-2">
+                                        {formData.images[0] ? (
+                                            <div className="relative w-48 h-48 border-2 border-gray-200 rounded-md">
+                                                <img
+                                                    src={formData.images[0]}
+                                                    alt="Foto Produk"
+                                                    className="w-full h-full object-cover rounded-md"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newImages = [...formData.images];
+                                                        newImages[0] = null;
+                                                        updateField('images', newImages);
+                                                    }}
+                                                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                                                    </svg>
+                                                    <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Klik untuk upload</span></p>
+                                                    <p className="text-xs text-gray-500">PNG, JPG (MAX. 800x400px)</p>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => handleFileChange(0, e.target.files[0])}
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                        )}
+                                    </div>
+                                </div>
+
                                 {/* Nama Produk */}
-                                <div className="flex flex-col">
-                                    <label>Nama Produk</label>
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Nama Produk</label>
                                     <div className="relative">
                                         <input
-                                            className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2 w-full"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                             type="text"
                                             value={formData.productName}
                                             onChange={(e) => {
@@ -194,7 +238,7 @@ const UpdateProductMitra = () => {
                                                 }
                                             }}
                                             maxLength={23}
-                                            placeholder="Nama Produk"
+                                            placeholder="Masukkan nama produk"
                                             required
                                         />
                                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
@@ -204,183 +248,163 @@ const UpdateProductMitra = () => {
                                 </div>
 
                                 {/* Deskripsi Produk */}
-                                <div className="flex flex-col">
-                                    <label>Deskripsi Produk</label>
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Deskripsi Produk</label>
                                     <textarea
-                                        placeholder="Deskripsi produk"
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        rows="5"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                        rows="4"
                                         value={formData.description}
                                         onChange={(e) => updateField('description', e.target.value)}
+                                        placeholder="Masukkan deskripsi produk"
                                         required
-                                    />
+                                    ></textarea>
                                 </div>
 
-                                {/* Harga Produk */}
-                                <div className="flex flex-col">
-                                    <label>Harga Produk</label>
-                                    <input
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        type="number"
-                                        value={formData.price}
-                                        onChange={(e) => updateField('price', e.target.value)}
-                                        placeholder="Masukkan harga produk"
-                                        required
-                                    />
-                                </div>
-
-                                {/* Foto Produk */}
-                                <div className="flex flex-col mt-4">
-                                    <label>Foto Produk</label>
-                                    <div className="flex gap-4 mt-2">
-                                        {formData.images.map((image, index) => (
-                                            <div key={index} className="relative w-24 h-24 border rounded-md flex items-center justify-center">
-                                                {image ? (
-                                                    <>
-                                                        <img src={image} alt={`Foto ${index + 1}`} className="w-full h-full object-cover rounded-md" />
-                                                        <button
-                                                            className="absolute top-1 right-1 bg-[#45c517] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                                                            onClick={() => handleFileChange(index, null)}
-                                                            type="button"
-                                                        >×</button>
-                                                    </>
-                                                ) : (
-                                                    <label className="flex flex-col items-center justify-center cursor-pointer text-gray-500 bg-gray-100 w-full h-full rounded-md">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={(e) => handleFileChange(index, e.target.files[0])}
-                                                            className="hidden"
-                                                        />
-                                                        <span className="text-xs">Tambah Foto {index + 1}</span>
-                                                    </label>
-                                                )}
-                                            </div>
-                                        ))}
+                                {/* Grid untuk Harga dan Stok */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">Harga Produk</label>
+                                        <input
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                            type="number"
+                                            value={formData.price}
+                                            onChange={(e) => updateField('price', e.target.value)}
+                                            placeholder="Masukkan harga"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">Stok</label>
+                                        <input
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                            type="number"
+                                            value={formData.stock}
+                                            onChange={(e) => updateField('stock', e.target.value)}
+                                            placeholder="Masukkan stok"
+                                            required
+                                        />
                                     </div>
                                 </div>
 
-                                {/* Kategori Produk */}
-                                <div className="flex flex-col">
-                                    <label htmlFor="category">Kategori Produk</label>
+                                {/* Kategori */}
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Kategori Produk</label>
                                     <select
-                                        id="category"
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        value={formData.category || ''}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                        value={formData.category}
                                         onChange={(e) => updateField('category', e.target.value)}
                                         required
                                     >
                                         <option value="">Pilih Kategori</option>
-                                        {isLoading ? (
-                                            <option>Loading...</option>
-                                        ) : error ? (
-                                            <option>Error: {error}</option>
-                                        ) : (
-                                            categoriesData.map((categoryItem) => (
-                                                <option
-                                                    key={categoryItem?.id}
-                                                    value={categoryItem?.name}
-                                                >
-                                                    {categoryItem?.name}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                </div>
-
-                                {/* Location Fields */}
-                                <div className="flex flex-col">
-                                    <label>Pilih Kota</label>
-                                    <select
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        value={formData.kota}
-                                        onChange={(e) => {
-                                            updateField('kota', e.target.value);
-                                            updateField('kecamatan', '');
-                                            updateField('kelurahan', '');
-                                        }}
-                                        required
-                                    >
-                                        <option value="">Pilih Kota</option>
-                                        {Object.keys(kotaData).map(kotaOption => (
-                                            <option key={kotaOption} value={kotaOption}>{kotaOption}</option>
+                                        {categoriesData.map((category) => (
+                                            <option key={category.id} value={category.name}>
+                                                {category.name}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label>Pilih Kecamatan</label>
-                                    <select
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        value={formData.kecamatan}
-                                        onChange={(e) => {
-                                            updateField('kecamatan', e.target.value);
-                                            updateField('kelurahan', '');
-                                        }}
-                                        disabled={!formData.kota}
-                                        required
-                                    >
-                                        <option value="">Pilih Kecamatan</option>
-                                        {Object.keys(kecamatanData).map(kecamatanOption => (
-                                            <option key={kecamatanOption} value={kecamatanOption}>{kecamatanOption}</option>
-                                        ))}
-                                    </select>
+                                {/* Grid untuk Lokasi */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">Kota</label>
+                                        <select
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                            value={formData.kota}
+                                            onChange={(e) => {
+                                                updateField('kota', e.target.value);
+                                                updateField('kecamatan', '');
+                                                updateField('kelurahan', '');
+                                            }}
+                                            required
+                                        >
+                                            <option value="">Pilih Kota</option>
+                                            {Object.keys(kotaData).map((kota) => (
+                                                <option key={kota} value={kota}>{kota}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">Kecamatan</label>
+                                        <select
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                            value={formData.kecamatan}
+                                            onChange={(e) => {
+                                                updateField('kecamatan', e.target.value);
+                                                updateField('kelurahan', '');
+                                            }}
+                                            disabled={!formData.kota}
+                                            required
+                                        >
+                                            <option value="">Pilih Kecamatan</option>
+                                            {Object.keys(kecamatanData).map((kecamatan) => (
+                                                <option key={kecamatan} value={kecamatan}>{kecamatan}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">Kelurahan</label>
+                                        <select
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                            value={formData.kelurahan}
+                                            onChange={(e) => updateField('kelurahan', e.target.value)}
+                                            disabled={!formData.kecamatan}
+                                            required
+                                        >
+                                            <option value="">Pilih Kelurahan</option>
+                                            {kelurahanData.map((kelurahan) => (
+                                                <option key={kelurahan} value={kelurahan}>{kelurahan}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label>Pilih Kelurahan</label>
-                                    <select
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        value={formData.kelurahan}
-                                        onChange={(e) => updateField('kelurahan', e.target.value)}
-                                        disabled={!formData.kecamatan}
-                                        required
-                                    >
-                                        <option value="">Pilih Kelurahan</option>
-                                        {kelurahanData.map((kelurahanOption, index) => (
-                                            <option key={index} value={kelurahanOption}>{kelurahanOption}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <label>Alamat Lengkap</label>
+                                {/* Lokasi Pengambilan */}
+                                <div>
+                                    <label className="block mb-2 font-medium text-gray-700">Lokasi Pengambilan</label>
                                     <input
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                         type="text"
                                         value={formData.detail}
                                         onChange={(e) => updateField('detail', e.target.value)}
-                                        placeholder="Alamat Lengkap"
+                                        placeholder="Masukkan lokasi pengambilan"
                                         required
                                     />
                                 </div>
 
-                                {/* Pickup Fields */}
-                                <div className="flex flex-col">
-                                    <label>Tanggal Pengambilan</label>
-                                    <input
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        type="date"
-                                        value={formatDateForInput(formData.date)}
-                                        onChange={(e) => updateField('date', formatDateForDisplay(e.target.value))}
-                                        required
-                                    />
+                                {/* Grid untuk Tanggal dan Waktu */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">Tanggal Pengambilan</label>
+                                        <input
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                            type="date"
+                                            value={formData.date}
+                                            onChange={(e) => updateField('date', e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block mb-2 font-medium text-gray-700">Waktu Pengambilan</label>
+                                        <input
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                            type="time"
+                                            value={formData.time}
+                                            onChange={(e) => updateField('time', e.target.value)}
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label>Jam Pengambilan</label>
-                                    <input
-                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                                        type="time"
-                                        value={formatTimeForInput(formData.time)}
-                                        onChange={(e) => updateField('time', formatTimeForDisplay(e.target.value))}
-                                        required
-                                    />
+                                {/* Tombol Submit */}
+                                <div className="flex justify-end">
+                                    <button
+                                        className="px-6 py-2 text-white bg-[#45c517] rounded-lg hover:bg-[#3ba513] focus:outline-none focus:ring-2 focus:ring-[#45c517] focus:ring-offset-2 transition-colors duration-200"
+                                        type="submit"
+                                    >
+                                        Update Produk
+                                    </button>
                                 </div>
-
-                                <button className="py-2 text-white rounded-full w-32 bg-[#47cb18] mt-4 mb-5" type="submit">
-                                    Update
-                                </button>
                             </form>
                         </section>
                     </div>

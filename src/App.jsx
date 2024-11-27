@@ -34,9 +34,17 @@ import AccountList from './pages/dashboard/admin/AccountList';
 import DashboardMitra from './pages/dashboard/mitra/DashboardMitra';
 import ShareMealsMitra from './pages/dashboard/mitra/ShareMealsMitra';
 import UpdateProductMitra from './pages/dashboard/mitra/UpdateProductMitra';
-import ProfileMitra from './pages/dashboard/mitra//ProfileMitra';
+import ProfileMitra from './pages/dashboard/mitra/ProfileMitra';
 import EditProfilMitra from './pages/dashboard/mitra/EditProfilMitra';
 import ShareMealsFormMitra from './pages/dashboard/mitra/ShareMealsFormMitra';
+
+import DashboardLS from './pages/dashboard/lembagasosial/DashboardLS';
+import CharityCampaignLS from './pages/dashboard/lembagasosial/CharityCampaignLS';
+import ProfileLS from './pages/dashboard/lembagasosial/ProfileLS';
+import AccountVerifFormLS from './pages/dashboard/lembagasosial/AccountVerifFormLS';
+import EditProfileLS from './pages/dashboard/lembagasosial/EditProfileLS';
+import UpdateCharityLS from './pages/dashboard/lembagasosial/UpdateCharityLS';
+import CreateCharityLS from './pages/dashboard/lembagasosial/CreateCharityLS';
 
 import AccountVerifForm from './pages/dashboard/AccountVerifForm';
 
@@ -84,9 +92,20 @@ const App = () => {
           <Route path="/sharemeals-mitra" element={<ShareMealsMitra />} />
           <Route path="/sharemeals-form-mitra" element={<ShareMealsFormMitra />} />
           <Route path="/profile-mitra" element={<ProfileMitra />} />
-          <Route path="/mitra/update-product/:id" element={<UpdateProductMitra />} />
+          <Route path="/update-product/:id" element={<UpdateProductMitra />} />
 
-          <Route path="/verif-form" element={<AccountVerifForm/>} />
+          <Route path="/verif-form" element={<AccountVerifForm />} />
+
+
+          <Route path="/lembaga-sosial" element={<DashboardLS />} />
+          <Route path="/charitycampaign-ls" element={<CharityCampaignLS />} />
+          <Route path="/update-charity-ls/:id" element={<UpdateCharityLS />} />
+          <Route path="/profile-ls" element={<ProfileLS />} />
+          <Route path="/verif-form-ls" element={<AccountVerifFormLS />} />
+          <Route path="/edit-profil-ls" element={<EditProfileLS />} />
+          <Route path="/create-charity-ls" element={<CreateCharityLS />} />
+
+
         </Routes>
       </Router>
 

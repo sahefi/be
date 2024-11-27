@@ -3,15 +3,35 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from "../../dashboard/Sidebar";
 import Navbar from "../../dashboard/Navbar";
 import { motion, AnimatePresence } from 'framer-motion';
+import ProductCard from './ProductCard';
 
 
 const DetailProduct = () => {
+  const [randomProducts, setRandomProducts] = useState([]);
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [total, setTotal] = useState(0);
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('description'); // New state for active tab
+
+  useEffect(() => {
+    fetch('/productData.json')
+      .then((response) => response.json())
+      .then((data) => {
+        const foundProduct = data.find((item) => item.id === parseInt(id, 10));
+        setProduct(foundProduct);
+
+        // Get random products
+        const filtered = data.filter(item => item.id !== parseInt(id, 10));
+        const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+        setRandomProducts(shuffled.slice(0, 4));
+
+        if (foundProduct) {
+          setTotal(foundProduct.price * quantity);
+        }
+      });
+  }, [id]);
 
   const tabVariants = {
     inactive: { width: 0, opacity: 0 },
@@ -122,12 +142,12 @@ const DetailProduct = () => {
       <section className="bg-[#f4fef1] w-full  pl-60 pt-20">
         <div className="mt-5 flex-grow">
           <Navbar showSearchBar={true} />
-         
+
           <section className="min-h-screen  mx-10">
             <div className=" flex mt-5 gap-5 justify-between">
-              
+
               <div className="mt-10 flex gap-10 p-5 shadow-md w-[650px] rounded-xl min-h-96 bg-white">
-              
+
                 {/* Product */}
                 <div className="flex flex-col min-w-48 gap-5">
                   <img
@@ -215,6 +235,9 @@ const DetailProduct = () => {
                     </motion.div>
                   </AnimatePresence>
                 </div>
+
+
+
               </div>
 
 
@@ -274,6 +297,17 @@ const DetailProduct = () => {
                   Berhasil ditambahkan ke keranjang
                 </p>
 
+              </div>
+
+            </div>
+
+            {/* Add before the closing div */}
+            <div className="mt-8 px-4">
+              <h2 className="text-2xl font-semibold mb-4 text-[#45c517]">Rekomendasi Lainnya</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {randomProducts.map((item) => (
+                  <ProductCard key={item.id} product={item} />
+                ))}
               </div>
             </div>
           </section>
