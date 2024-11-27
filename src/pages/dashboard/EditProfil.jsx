@@ -37,22 +37,9 @@ const EditProfil = () => {
                 <div className="flex-grow">
                     <Navbar />
 
-                    <section className="min-h-screen mx-10 my-5 ">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="50"
-                            height="50"
-                            fill="currentColor"
-                            className="text-green-500 mt-5 hover:cursor-pointer bi bi-arrow-left-short"
-                            viewBox="0 0 16 16"
-                            onClick={() => window.history.back()}
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
-                            />
-                        </svg>
-                        <h1 className="mt-5 text-2xl font-bold text-[#45c517]">
+                    <section className="min-h-screen mx-10 mt-5 mb-5 ">
+                     
+                        <h1 className=" text-2xl font-bold text-[#45c517]">
                             Edit Profil
                         </h1>
                         <section className="w-full bg-white rounded-xl p-6 mt-5 shadow-md">

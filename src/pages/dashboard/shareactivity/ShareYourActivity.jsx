@@ -43,7 +43,7 @@ const ShareYourActivity = () => {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mx-10 h-16 flex items-center justify-between"
+                className="mx-10 mt-5 h-16 flex items-center justify-between"
               >
                 <h1 className="text-2xl font-bold text-[#45c517]">Feeds</h1>
                 <div className="flex gap-5">

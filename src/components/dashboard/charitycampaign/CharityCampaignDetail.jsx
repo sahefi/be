@@ -24,78 +24,65 @@ const CharityCampaignDetail = () => {
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
           <Navbar />
-          <div className="mt-5 mx-10">
-            <section className="bg-white shadow-md rounded-xl p-5 mb-5">
-              {/* Gambar Kampanye */}
+          <div className="mt-10 mx-10">
+            <div className="bg-white shadow-md rounded-xl p-5 mb-5 flex flex-col md:flex-row gap-6">
               <img
                 src={campaign.campaign_image_url}
-                alt="Campaign Image"
-                className="w-full h-72 object-cover rounded-md my-5"
+                alt="Campaign"
+                className="w-full md:w-1/2 h-64 object-cover rounded-md"
               />
-
-              {/* Nama dan Lokasi Yayasan */}
-              <div className='my-5 flex gap-3 items-center'>
-                <img className='min-w-10 h-10 object-cover rounded-full' src={campaign.image_url} alt="" />
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <img className="w-10 h-10 object-cover rounded-full" src={campaign.image_url} alt={campaign.name} />
+                  <div>
+                    <p className="font-semibold">{campaign.name}</p>
+                    <p className="text-sm text-gray-600">{campaign.location}</p>
+                  </div>
+                </div>
+                <h1 className="text-2xl font-bold mb-4">{campaign.campaign_title}</h1>
                 <div>
-                  <p className=" font-semibold">{campaign.name}</p>
-                  <p className=" ">{campaign.location}</p>
+                  <h3 className="text-lg font-bold">Terkumpul</h3>
+                  <p className="text-sm mb-2">
+                    Rp{campaign.collected.toLocaleString('id-ID')} dari Rp{campaign.target.toLocaleString('id-ID')}
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                    <div
+                      className="bg-[#45c517] h-2.5 rounded-full"
+                      style={{ width: `${(campaign.collected / campaign.target) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+                <button
+                  className="bg-[#45c517] text-white w-full p-2 hover:bg-green-600 rounded-full transition duration-300"
+                  onClick={() => navigate(`/charity-transaction/${campaign.id}`)}
+                >
+                  Donasi Sekarang
+                </button>
+              </div>
+            </div>
+
+            <section className="bg-white shadow-md rounded-xl p-5">
+              <h1 className="text-xl font-semibold text-[#45c517] border-b pb-2 border-[#45c517] mb-4">Informasi Campaign</h1>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h2 className="font-semibold">Deskripsi Campaign</h2>
+                  <p className="text-sm">{campaign.description}</p>
+                </div>
+                <div>
+                  <h2 className="font-semibold">Kategori Campaign</h2>
+                  <p className="text-sm">{campaign.category}</p>
+                </div>
+                <div>
+                  <h2 className="font-semibold">Target Campaign</h2>
+                  <p className="text-sm">{formatPrice(campaign.target)}</p>
+                </div>
+                <div>
+                  <h2 className="font-semibold">Durasi Campaign</h2>
+                  <p className="text-sm">Mulai: {campaign.start_date}</p>
+                  <p className="text-sm">Selesai: {campaign.end_date}</p>
                 </div>
               </div>
-
-
-              {/* Judul Kampanye */}
-              <h1 className="text-2xl font-bold">{campaign.campaign_title}</h1>
-
-              {/* Informasi Terkumpul */}
-              <div className="mt-5">
-                <h3 className="text-lg font-bold">Terkumpul</h3>
-                <p className="text-sm">
-                  Rp{campaign.collected.toLocaleString('id-ID')} dari Rp{campaign.target.toLocaleString('id-ID')}
-                </p>
-                <div className="w-full bg-gray-300 rounded-full h-2.5 my-4">
-                  <div
-                    className="bg-[#45c517] h-2.5 rounded-full"
-                    style={{ width: `${(campaign.collected / campaign.target) * 100}%` }}
-                  ></div>
-                </div>
-              
-              </div>
             </section>
-
-
-
-            <section className='mb-5 bg-white shadow-md rounded-xl p-5'>
-              <h1 className='text-xl font-semibold text-[#45c517] border-b-[1px] pb-2 border-[#45c517] '>Informasi Campaign</h1>
-              <div className='mt-5'>
-                <h1 className='font-semibold'>Deskripsi Campaign</h1>
-                <p>{campaign.description}</p>
-              </div>
-
-              <div className='mt-5'>
-                <h1 className='font-semibold'>Kategori Campaign</h1>
-                <p>{campaign.category}</p>
-              </div>
-
-              <div className='mt-5'>
-                <h1 className='font-semibold'>Target Campaign</h1>
-                <p>{formatPrice(campaign.target)}</p>
-              </div>
-
-              <div className='mt-5'>
-                <h1 className='font-semibold'>Durasi Campaign</h1>
-                <p>Mulai: {campaign.start_date}</p>
-                <p>Selesai: {campaign.end_date}</p>
-              </div>
-
-              <button
-                className='bg-[#45c517] text-white w-full p-2 hover:bg-green-600 rounded-full mt-5 transition duration-300'
-                onClick={() => navigate(`/charity-transaction/${campaign.id}`)}
-              >
-                Donasi Sekarang
-              </button>
-
-            </section>
-
           </div>
         </div>
       </section>

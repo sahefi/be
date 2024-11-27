@@ -64,7 +64,7 @@ const AdminDashboard = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="mt-5 mx-10 text-2xl font-bold"
+            className="mt-5 mx-10 text-2xl font-bold text-[#45c517]"
           >
             Dashboard
           </motion.h1>

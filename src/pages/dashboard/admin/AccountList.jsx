@@ -64,8 +64,10 @@ const AccountList = () => {
             >
                 <div className="flex-grow">
                     <NavbarAdmin />
+
+                    <h1 className='text-2xl font-bold text-[#45c517] mt-5 mx-10'>Daftar Akun</h1>
                     <motion.section 
-                        className="p-5 mx-10 my-10 rounded-xl bg-white shadow-md"
+                        className="p-5 mx-10 my-5 rounded-xl bg-white shadow-md"
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"

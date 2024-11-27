@@ -27,21 +27,8 @@ const Profile = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="50"
-                            height="50"
-                            fill="currentColor"
-                            className="text-green-500 mt-5 mx-10 hover:cursor-pointer bi bi-arrow-left-short transition-transform hover:-translate-x-1"
-                            viewBox="0 0 16 16"
-                            onClick={() => window.history.back()}
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
-                            />
-                        </svg>
-                        <h1 className="mt-5 mx-10 text-2xl font-bold text-[#45c517] animate-fadeIn">
+                    
+                        <h1 className="mt-10 mx-10 text-2xl font-bold text-[#45c517] animate-fadeIn">
                             Profile
                         </h1>
                     </motion.div>

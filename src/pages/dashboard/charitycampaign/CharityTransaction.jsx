@@ -36,64 +36,68 @@ const CharityTransaction = () => {
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
                     <Navbar />
-                    <section className="min-h-screen mx-10 my-5 rounded-md bg-white shadow-md p-6">
-                        {/* Header Kampanye */}
-                        <div className="mb-5">
-                            <img
-                                className="w-full h-48 object-cover rounded-xl"
-                                src={campaign.campaign_image_url}
-                                alt={campaign.campaign_title}
-                            />
-                            <h1 className="font-semibold text-xl mt-5">{campaign.campaign_title}</h1>
-                        </div>
+                    <section className="mt-10 min-h-screen mx-10 my-5 rounded-lg bg-white shadow-lg p-8">
+                        <div className="flex flex-col md:flex-row gap-8">
+                            {/* Left Column: Campaign Image and Details */}
+                            <div className="md:w-1/2">
+                                <img
+                                    className="w-full h-64 object-cover rounded-xl shadow-md"
+                                    src={campaign.campaign_image_url}
+                                    alt={campaign.campaign_title}
+                                />
+                                <h1 className="font-bold text-2xl mt-6 text-gray-800">{campaign.campaign_title}</h1>
+                                <p className="text-gray-600 mt-2">{campaign.description}</p>
+                            </div>
 
-                        {/* Pilihan Nominal */}
-                        <h1 className="text-lg font-semibold text-[#45c517] mb-4">Pilih Nominal Donasi</h1>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            {['10000', '20000', '50000', '100000'].map((amount) => (
-                                <button
-                                    key={amount}
-                                    className={`border border-[#45c517] font-bold py-2 rounded-md text-center ${selectedAmount === amount
-                                            ? 'bg-[#45c517] text-white'
-                                            : 'text-green-600 hover:bg-green-100'
-                                        }`}
-                                    onClick={() => handleNominalClick(amount)}
+                            {/* Right Column: Donation Form */}
+                            <div className="md:w-1/2">
+                                <h2 className="text-xl font-semibold text-[#45c517] mb-6">Pilih Nominal Donasi</h2>
+                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                    {['10000', '20000', '50000', '100000'].map((amount) => (
+                                        <button
+                                            key={amount}
+                                            className={`border-2 border-[#45c517] font-bold py-3 rounded-lg text-center transition-all duration-300 ${selectedAmount === amount
+                                                ? 'bg-[#45c517] text-white shadow-md'
+                                                : 'text-green-600 hover:bg-green-50'
+                                                }`}
+                                            onClick={() => handleNominalClick(amount)}
+                                        >
+                                            Rp{formatNumber(amount)}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <h3 className="text-lg font-medium text-gray-700 mb-3">
+                                    Atau Masukkan Nominal Donasi Pilihanmu
+                                </h3>
+                                <div className="relative mb-8">
+                                    <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500 text-lg">Rp</span>
+                                    <input
+                                        type="text"
+                                        placeholder="0"
+                                        value={donationAmount}
+                                        onChange={handleInputChange}
+                                        className="pl-10 border-2 border-green-500 w-full rounded-lg py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-300 text-lg"
+                                    />
+                                </div>
+
+                                <Link
+                                    to={`/payment-charity/${id}`}
+                                    state={{ total: parseInt(donationAmount.replace(/\./g, '')) }}
+                                    className="block"
                                 >
-                                    Rp{formatNumber(amount)}
-                                </button>
-                            ))}
+                                    <button
+                                        className={`${donationAmount
+                                            ? 'bg-[#45c517] text-white hover:bg-green-600'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            } font-bold py-4 rounded-lg w-full text-center transition duration-300 text-lg shadow-md hover:shadow-lg`}
+                                        disabled={!donationAmount}
+                                    >
+                                        Pilih Metode Pembayaran
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
-
-                        {/* Input Nominal Pilihan */}
-                        <h2 className="text-sm font-medium text-gray-700 mb-2">
-                            Atau Masukkan Nominal Donasi Pilihanmu
-                        </h2>
-                        <div className="relative mb-6">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">Rp</span>
-                            <input
-                                type="text"
-                                placeholder="0"
-                                value={donationAmount}
-                                onChange={handleInputChange}
-                                className="pl-8 border border-green-500 w-full rounded-md py-2 text-gray-700 focus:outline-none focus:ring focus:ring-green-300"
-                            />
-                        </div>
-
-                        {/* Tombol Pilih Metode Pembayaran */}
-                        <Link
-                            to={`/payment-charity/${id}`}
-                            state={{ total: parseInt(donationAmount.replace(/\./g, '')) }}
-                        >
-                            <button
-                                className={`${donationAmount
-                                        ? 'bg-[#45c517] text-white hover:bg-green-600'
-                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    } font-bold py-3 rounded-full w-full text-center transition duration-300`}
-                                disabled={!donationAmount}
-                            >
-                                Pilih Metode Pembayaran
-                            </button>
-                        </Link>
                     </section>
                 </div>
             </section>

@@ -74,7 +74,7 @@ const GrabMeals = () => {
           <Navbar showSearchBar={true} />
           
           <motion.h1 
-            className="mt-5 mx-10 text-2xl font-bold text-[#45c517]"
+            className="mt-10 mx-10 text-2xl font-bold text-[#45c517]"
             variants={itemVariants}
           >
             Grab Meals

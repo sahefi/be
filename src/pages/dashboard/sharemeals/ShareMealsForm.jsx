@@ -14,7 +14,7 @@ const ShareMealsForm = () => {
   const [productDescription, setProductDescription] = useState("");
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState("");
-  const [images, setImages] = useState(Array(5).fill(null));
+  const [image, setImage] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedKota, setSelectedKota] = useState("");
   const [selectedKecamatan, setSelectedKecamatan] = useState("");
@@ -34,23 +34,19 @@ const ShareMealsForm = () => {
   const kecamatanData = selectedKota ? kotaData[selectedKota] : {};
   const kelurahanData = selectedKecamatan ? kecamatanData[selectedKecamatan] : [];
 
-  const handleFileChange = (e, index) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const newImages = [...images];
-        newImages[index] = reader.result;
-        setImages(newImages);
+        setImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleDeleteImage = (index) => {
-    const newImages = [...images];
-    newImages[index] = null;
-    setImages(newImages);
+  const handleDeleteImage = () => {
+    setImage(null);
   };
 
   const handleDateChange = (e) => {
@@ -91,19 +87,53 @@ const ShareMealsForm = () => {
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
           <Navbar />
-          <div className="mt-5 mx-10">
-            <h1 className="text-[#45c517] text-2xl font-bold">Bagikan Produk</h1>
-           
+          <div className="mt-10 mx-10">
 
-            <section className="p-3 rounded-md bg-white shadow-md mt-5">
+
+            <section className="p-3 rounded-xl bg-white shadow-md mt-5">
               <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Informasi Produk dan Pengambilan</h1>
-              <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Foto Produk */}
+                <div className="flex flex-col">
+                  <label className="text-gray-700 font-medium mb-2">Foto Produk</label>
+                  <div className="flex gap-4">
+                    <div className="relative w-24 h-24 border-2 border-green-300 rounded-lg flex items-center justify-center overflow-hidden">
+                      {image ? (
+                        <>
+                          <img
+                            src={image}
+                            alt="Foto Produk"
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            className="absolute top-1 right-1 bg-[#45c517] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-green-600"
+                            onClick={handleDeleteImage}
+                            type="button"
+                          >
+                            ×
+                          </button>
+                        </>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center cursor-pointer text-gray-500 bg-gray-50 w-full h-full hover:bg-gray-100">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="hidden"
+                          />
+                          <span className="text-xs text-center">Tambah Foto</span>
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Nama Produk */}
                 <div className="flex flex-col">
-                  <label>Nama Produk</label>
+                  <label className="text-gray-700 font-medium mb-2">Nama Produk</label>
                   <div className="relative">
                     <input
-                      className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2 w-full"
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                       type="text"
                       value={productName}
                       onChange={(e) => {
@@ -123,10 +153,10 @@ const ShareMealsForm = () => {
 
                 {/* Deskripsi Produk */}
                 <div className="flex flex-col">
-                  <label>Deskripsi Produk</label>
+                  <label className="text-gray-700 font-medium mb-2">Deskripsi Produk</label>
                   <textarea
                     placeholder="Deskripsi produk"
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                    className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                     rows="5"
                     value={productDescription}
                     onChange={(e) => setProductDescription(e.target.value)}
@@ -134,64 +164,37 @@ const ShareMealsForm = () => {
                   ></textarea>
                 </div>
 
-                {/* Harga Produk */}
-                <div className="flex flex-col">
-                  <label>Harga Produk</label>
-                  <input
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="Masukkan harga produk"
-                    required
-                  />
-                </div>
-
-                {/* Foto Produk */}
-                <div className="flex flex-col mt-4">
-                  <label>Foto Produk</label>
-                  <div className="flex gap-4 mt-2">
-                    {images.map((image, index) => (
-                      <div
-                        key={index}
-                        className="relative w-24 h-24 border rounded-md flex items-center justify-center"
-                      >
-                        {image ? (
-                          <>
-                            <img
-                              src={image}
-                              alt={`Foto ${index + 1}`}
-                              className="w-full h-full object-cover rounded-md"
-                            />
-                            <button
-                              className="absolute top-1 right-1 bg-[#45c517] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                              onClick={() => handleDeleteImage(index)}
-                              type="button"
-                            >
-                              ×
-                            </button>
-                          </>
-                        ) : (
-                          <label className="flex flex-col items-center justify-center cursor-pointer text-gray-500 bg-gray-100 w-full h-full rounded-md">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleFileChange(e, index)}
-                              className="hidden"
-                            />
-                            <span className="text-xs">Tambah Foto {index + 1}</span>
-                          </label>
-                        )}
-                      </div>
-                    ))}
+                {/* Harga dan Stok */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Harga Produk</label>
+                    <input
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="Masukkan harga produk"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Stok</label>
+                    <input
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      type="number"
+                      value={stock}
+                      onChange={(e) => setStock(e.target.value)}
+                      placeholder="Jumlah stok"
+                      required
+                    />
                   </div>
                 </div>
 
                 {/* Kategori Produk */}
                 <div className="flex flex-col">
-                  <label>Kategori Produk</label>
+                  <label className="text-gray-700 font-medium mb-2">Kategori Produk</label>
                   <select
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                    className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                     required
@@ -205,113 +208,107 @@ const ShareMealsForm = () => {
                   </select>
                 </div>
 
-                {/* Kota */}
-                <div className="flex flex-col">
-                  <label>Pilih Kota</label>
-                  <select
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                    value={selectedKota}
-                    onChange={(e) => {
-                      setSelectedKota(e.target.value);
-                      setSelectedKecamatan("");
-                      setSelectedKelurahan("");
-                    }}
-                    required
+                {/* Lokasi */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Kota</label>
+                    <select
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      value={selectedKota}
+                      onChange={(e) => setSelectedKota(e.target.value)}
+                      required
+                    >
+                      <option value="">Pilih Kota</option>
+                      {Object.keys(kotaData).map((kota) => (
+                        <option key={kota} value={kota}>
+                          {kota}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Kecamatan</label>
+                    <select
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      value={selectedKecamatan}
+                      onChange={(e) => setSelectedKecamatan(e.target.value)}
+                      required
+                      disabled={!selectedKota}
+                    >
+                      <option value="">Pilih Kecamatan</option>
+                      {Object.keys(kecamatanData).map((kecamatan) => (
+                        <option key={kecamatan} value={kecamatan}>
+                          {kecamatan}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Kelurahan</label>
+                    <select
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      value={selectedKelurahan}
+                      onChange={(e) => setSelectedKelurahan(e.target.value)}
+                      required
+                      disabled={!selectedKecamatan}
+                    >
+                      <option value="">Pilih Kelurahan</option>
+                      {kelurahanData.map((kelurahan) => (
+                        <option key={kelurahan} value={kelurahan}>
+                          {kelurahan}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Detail Lokasi</label>
+                    <input
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      type="text"
+                      value={pickupLocation}
+                      onChange={(e) => setPickupLocation(e.target.value)}
+                      placeholder="Detail lokasi pengambilan"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Waktu Pengambilan */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Tanggal Pengambilan</label>
+                    <input
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      type="date"
+                      value={date}
+                      onChange={handleDateChange}
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label className="text-gray-700 font-medium mb-2">Waktu Pengambilan</label>
+                    <input
+                      className="w-full rounded-lg border-2 border-green-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+                      type="time"
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="submit"
+                    className="bg-[#45c517] text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors"
                   >
-                    <option value="">Pilih Kota</option>
-                    {Object.keys(kotaData).map((kota) => (
-                      <option key={kota} value={kota}>
-                        {kota}
-                      </option>
-                    ))}
-                  </select>
+                    Simpan
+                  </button>
                 </div>
-
-                {/* Kecamatan */}
-                <div className="flex flex-col">
-                  <label>Pilih Kecamatan</label>
-                  <select
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                    value={selectedKecamatan}
-                    onChange={(e) => {
-                      setSelectedKecamatan(e.target.value);
-                      setSelectedKelurahan("");
-                    }}
-                    disabled={!selectedKota}
-                    required
-                  >
-                    <option value="">Pilih Kecamatan</option>
-                    {selectedKota && Object.keys(kecamatanData).map((kecamatan) => (
-                      <option key={kecamatan} value={kecamatan}>
-                        {kecamatan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Kelurahan */}
-                <div className="flex flex-col">
-                  <label>Pilih Kelurahan</label>
-                  <select
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                    value={selectedKelurahan}
-                    onChange={(e) => setSelectedKelurahan(e.target.value)}
-                    disabled={!selectedKecamatan}
-                    required
-                  >
-                    <option value="">Pilih Kelurahan</option>
-                    {selectedKecamatan && kelurahanData.map((kelurahan, index) => (
-                      <option key={index} value={kelurahan}>
-                        {kelurahan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Alamat Lengkap */}
-                <div className="flex flex-col">
-                  <label>Alamat Lengkap</label>
-                  <input
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                    type="text"
-                    value={pickupLocation}
-                    onChange={(e) => setPickupLocation(e.target.value)}
-                    placeholder="Alamat Lengkap"
-                    required
-                  />
-                </div>
-
-                {/* Tanggal Pengambilan */}
-                <div className="flex flex-col">
-                  <label>Tanggal Pengambilan</label>
-                  <input
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                    type="date"
-                    value={date}
-                    onChange={handleDateChange}
-                    required
-                  />
-                </div>
-
-                {/* Jam Pengambilan */}
-                <div className="flex flex-col">
-                  <label>Jam Pengambilan</label>
-                  <input
-                    className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {/* Tombol Submit */}
-                <button
-                  className="py-2 text-white rounded-full w-32 bg-[#47cb18] mt-4 mb-5"
-                  type="submit"
-                >
-                  Upload
-                </button>
               </form>
             </section>
           </div>

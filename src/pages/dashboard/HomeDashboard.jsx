@@ -120,11 +120,11 @@ const HomeDashboard = () => {
             variants={containerVariants}
           >
             <motion.div
-              className="flex justify-between items-center mb-3"
+              className="flex justify-between items-center mb-5"
               variants={itemVariants}
             >
               <h2 className="text-2xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-[#45c517]">
-                Featured Products
+                Temukan Produk Terbaik
               </h2>
               <motion.a
                 href="/products"
@@ -182,11 +182,11 @@ const HomeDashboard = () => {
             variants={containerVariants}
           >
             <motion.div
-              className="flex justify-between items-center mb-3"
+              className="flex justify-between items-center mb-5"
               variants={itemVariants}
             >
               <h2 className="text-2xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-[#45c517]">
-                Charity Campaigns
+                Mari Berkontribusi!
               </h2>
               <motion.a
                 href="/charity"
@@ -230,7 +230,7 @@ const HomeDashboard = () => {
 
 
           <section className="">
-            <h2 className="mb-3text-2xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-[#45c517]">
+            <h2 className="mb-5 text-2xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-[#45c517]">
               Baca Artikel Terbaru
             </h2>
 

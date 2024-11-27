@@ -33,7 +33,7 @@ const BlogArtikel = () => {
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
           {/* Static Navbar */}
-          <Navbar showSearchBar={true} />
+          <Navbar showSearchBar={false} />
 
           <motion.div
             className="mt-5 mx-10 flex justify-between items-center"
