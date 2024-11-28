@@ -1,4 +1,4 @@
-import NavbarLanding from "../../components/landingpage/NavbarLanding"
+import NavbarLanding from "../../../../../../../Dev/carebites-fe-be/carebites_v2/src/components/landingpage/NavbarLanding"
 import RegistImage from "../../assets/img/donate.png"
 import { Link } from "react-router-dom"
 

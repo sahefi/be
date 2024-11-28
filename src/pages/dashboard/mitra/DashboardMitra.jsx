@@ -28,7 +28,7 @@ const VerificationPopup = ({ isOpen, onClose }) => {
                     <h2 className="text-2xl font-bold mb-4 text-[#45c517]">Verifikasi Akun Diperlukan</h2>
                     <p className="mb-6 text-gray-600">Mohon verifikasi akun Anda terlebih dahulu untuk mengakses fitur lengkap.</p>
                     <div className="flex justify-center gap-5">
-                        <Link to="/verif-form">
+                        <Link to="/verif-form-mitra">
                             <button
                                 onClick={onClose}
                                 className="bg-[#45c517] text-white px-6 py-2 rounded-full hover:bg-[#3ba313] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#45c517] focus:ring-opacity-50"
@@ -50,9 +50,6 @@ const VerificationPopup = ({ isOpen, onClose }) => {
     );
 };
 
-
-
-
 const DashboardMitra = () => {
     const [selectedTransaksi, setSelectedTransaksi] = useState(null);
     const [allTransaksi, setAllTransaksi] = useState([]);
@@ -60,7 +57,6 @@ const DashboardMitra = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [transaksiPerPage, setTransaksiPerPage] = useState(15); // Default to 15
     const [showVerificationPopup, setShowVerificationPopup] = useState(false);
-    const [showSidebar, setShowSidebar] = useState(false);
     const [showTransaksiPopup, setShowTransaksiPopup] = useState(false);
 
     useEffect(() => {
@@ -107,11 +103,6 @@ const DashboardMitra = () => {
         setTotalPages(Math.ceil(flattenedTransaksi.length / transaksiPerPage));
     }, [transaksiPerPage]); // Add transaksiPerPage as a dependency
 
-
-    const closePopup = () => {
-        setSelectedTransaksi(null);
-    };
-
     // Handle pagination change
     const goToPage = (page) => {
         setCurrentPage(page);
@@ -147,8 +138,6 @@ const DashboardMitra = () => {
                         className="mx-10 mt-5"
                     >
                         <h1 className="text-2xl font-bold text-[#45c517]">Dashboard</h1>
-
-
                         <div className='my-5 flex gap-5 justify-between'>
                             <motion.div
                                 variants={containerVariants}
@@ -324,10 +313,7 @@ const DashboardMitra = () => {
         </div>
     );
 };
-
 export default DashboardMitra;
-
-
 
 const InfoItem = ({ label, value }) => (
     <div>
@@ -335,7 +321,6 @@ const InfoItem = ({ label, value }) => (
         <p className="font-medium">{value}</p>
     </div>
 );
-
 
 const PopupTransaksi = ({ isOpen, onClose, dataTransaksi }) => {
     if (!isOpen || !dataTransaksi) return null;

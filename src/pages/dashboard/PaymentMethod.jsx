@@ -96,7 +96,7 @@ const PaymentMethod = () => {
                 <div className="flex-grow">
                     <Navbar showSearchBar={true} />
                     <h1 className="mt-10 mx-10 text-2xl font-bold text-[#45c517]">Metode Bayar</h1>
-                   
+
                     <section className="min-h-screen mx-10 my-5 ">
                         <div className="flex gap-5">
                             {/* Daftar Metode Pembayaran */}
@@ -205,13 +205,12 @@ const PaymentMethod = () => {
                                     </div>
                                 </div>
 
-                                {/* Add loading button state */}
                                 <div
                                     onClick={!isLoading ? handleConfirmPayment : undefined}
                                     className={`${isLoading
                                         ? 'bg-gray-400 cursor-not-allowed'
                                         : 'hover:cursor-pointer hover:bg-green-600 bg-[#45c517]'
-                                        } p-1 py-2 text-center rounded-full`}
+                                        } p-1 py-2 text-center rounded-full max-w-xs mx-auto`} // Added max-w-xs and mx-auto
                                 >
                                     {isLoading ? (
                                         <div className="flex items-center justify-center gap-2">

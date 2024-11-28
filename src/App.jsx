@@ -94,7 +94,7 @@ const App = () => {
           <Route path="/profile-mitra" element={<ProfileMitra />} />
           <Route path="/update-product/:id" element={<UpdateProductMitra />} />
 
-          <Route path="/verif-form" element={<AccountVerifForm />} />
+          <Route path="/verif-form-mitra" element={<AccountVerifForm />} />
 
 
           <Route path="/lembaga-sosial" element={<DashboardLS />} />

@@ -109,7 +109,7 @@ const GrandProduct = () => {
                                             state={{ total }}
                                             className="block w-full mt-6"
                                         >
-                                            <button className="w-full bg-[#45c517] hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                                            <button className="w-full bg-[#45c517] hover:bg-green-600 text-white font-bold py-2  px-1 rounded-full text-md transition duration-300">
                                                 Pilih Metode Pembayaran
                                             </button>
                                         </Link>
