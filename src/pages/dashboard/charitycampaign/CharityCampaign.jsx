@@ -2,10 +2,21 @@ import { motion } from "framer-motion";
 import Sidebar from "../../../components/dashboard/Sidebar";
 import Navbar from "../../../components/dashboard/Navbar";
 import CharityCard from "../../../components/dashboard/charitycampaign/CharityCard";
-import charityData from '../../../assets/charitycampaign/lembagaSosialData.json';
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const CharityCampaign = () => {
+  const [charityCampaigns, setCharityCampaigns] = useState([]);
+  useEffect(() => {
+    axios.get('http://localhost:8085/penggalangan')
+      .then(response => {
+        setCharityCampaigns(response.data); // Set data ke state        
+      })
+      .catch(error => {
+        console.error("There was an error fetching the charity campaigns!", error);        
+      });
+  }, []);
+  
   return (
     <div className="flex min-h-screen">
       <Sidebar showSearchBar={true} />
@@ -100,7 +111,7 @@ const CharityCampaign = () => {
                 </div>
                 <div>
                   <p className="text-gray-500 text-sm">Total Kampanye</p>
-                  <p className="text-2xl font-bold text-gray-800">{charityData.length}</p>
+                  <p className="text-2xl font-bold text-gray-800">{charityCampaigns.length}</p>
                 </div>
               </div>
             </div>
@@ -164,7 +175,7 @@ const CharityCampaign = () => {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-wrap justify-even gap-10"
             >
-              {charityData.map((lembaga, index) => (
+              {charityCampaigns.map((lembaga, index) => (
                 <motion.div
                   key={lembaga.id}
                   initial={{ opacity: 0, y: 50 }}
@@ -172,15 +183,15 @@ const CharityCampaign = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
                   <CharityCard
-                    id={lembaga.id}
-                    name={lembaga.name}
-                    location={lembaga.location}
-                    image_url={lembaga.image_url}
+                    id={lembaga._id}
+                    name={lembaga.user?.nama_user}
+                    location={lembaga.lokasi}
+                    image_url={lembaga.user?.avatar}
                     campaign={{
-                      title: lembaga.campaign_title,
-                      collected: lembaga.collected,
+                      title: lembaga.namaGalangDana,
+                      collected: lembaga.target,
                       target: lembaga.target,
-                      campaign_image_url: lembaga.campaign_image_url,
+                      campaign_image_url: lembaga.filename[0],
                     }}
                   />
                 </motion.div>

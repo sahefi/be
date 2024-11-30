@@ -14,7 +14,11 @@ const ArticleCard = ({ article }) => {
 
             <div className="relative w-full h-[45%]"> {/* Added relative container for the image */}
                 <img
-                    src={article.filename[0]}
+                    src={
+                        Array.isArray(article?.filename) && article.filename.length > 0
+                          ? article.filename[0] // Jika filename adalah array dan memiliki elemen
+                          : '/profile.png'       // Fallback ke gambar default
+                      }
                     className='rounded-md w-full h-full object-cover' 
                     alt="Gambar Artikel"
                 />

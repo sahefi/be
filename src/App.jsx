@@ -47,23 +47,30 @@ import UpdateCharityLS from './pages/dashboard/lembagasosial/UpdateCharityLS';
 import CreateCharityLS from './pages/dashboard/lembagasosial/CreateCharityLS';
 
 import AccountVerifForm from './pages/dashboard/AccountVerifForm';
+import ProtectedRoute from './pages/Auth/ProtectedRoute';
+import Forbidden from './pages/Auth/Forbidden';
 
 const App = () => {
+
+  const userData = JSON.parse(sessionStorage.getItem('user')) || {};
   return (
     <div>
 
       <Router>
         <Routes>
+          <Route path="/regist" element={<RegistrationPage />} />
+          <Route path="/403" element={<Forbidden />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<HomeLanding />} />
+
+          <Route element={<ProtectedRoute allowedRoles={['pengguna']} userRole={userData.role} />}>
           <Route path="/home" element={<HomeDashboard />} />
           <Route path="/share-meals" element={<ShareMeals />} />
           <Route path="/grab-meals" element={<GrabMeals />} />
-          <Route path="/charity-campaign" element={<CharityCampaign />} />
+          <Route path="/charity-campaign" element={<CharityCampaign />} />          
           <Route path="/blog" element={<BlogArtikel />} />
           <Route path="/share-activity" element={<ShareYourActivity />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
-          <Route path="/regist" element={<RegistrationPage />} />
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/cart" element={<CartMeals />} />
           <Route path="/payment/:id" element={<GrandProduct />} />
           <Route path="/article/:id" element={<ArticleDetail />} />
@@ -77,7 +84,7 @@ const App = () => {
           <Route path="/share-meals/form" element={<ShareMealsForm />} />
           <Route path="/profil/edit-profil" element={<EditProfil />} />
           <Route path="/share-meals/update/:id" element={<UpdateShareMeals />} />
-
+          </Route>
 
           <Route path="/account-list" element={<AccountList />} />
           <Route path="/admin" element={<AdminDashboard />} />
@@ -87,12 +94,14 @@ const App = () => {
           <Route path="/article-detail-verif/:id" element={<ArticleVerifDetail />} />
           <Route path="/account-verif/:id" element={<AccountDetailVerif />} />
 
+          <Route element={<ProtectedRoute allowedRoles={['mitra']} userRole={userData.role} />}>
           <Route path="/edit-profil-mitra" element={<EditProfilMitra />} />
           <Route path="/mitra" element={<DashboardMitra />} />
           <Route path="/sharemeals-mitra" element={<ShareMealsMitra />} />
           <Route path="/sharemeals-form-mitra" element={<ShareMealsFormMitra />} />
           <Route path="/profile-mitra" element={<ProfileMitra />} />
           <Route path="/update-product/:id" element={<UpdateProductMitra />} />
+          </Route>
 
           <Route path="/verif-form-mitra" element={<AccountVerifForm />} />
 

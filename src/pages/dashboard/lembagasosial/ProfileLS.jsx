@@ -1,17 +1,18 @@
 import { motion } from 'framer-motion';
 import SidebarLS from '../../../components/dashboard/lembagasosial/SidebarLS';
 import NavbarLS from '../../../components/dashboard/lembagasosial/NavbarLS';
-import lembagaSosialData from '../../../assets/user/lembagaSosialData.json';
 import { Link } from "react-router-dom";
 
 const ProfileLS = () => {
+    const useData = JSON.parse(localStorage.getItem('user')) || {};
+
     return (
         <div className="flex min-h-screen">
             <SidebarLS />
 
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
-                    <NavbarLS showSearchBar={true} />
+                    <NavbarLS showSearchBar={false} />
 
                     <motion.h1
                         initial={{ opacity: 0, y: -20 }}
@@ -36,11 +37,11 @@ const ProfileLS = () => {
                             >
                                 <img
                                     className="w-36 h-36 object-cover rounded-full"
-                                    src={lembagaSosialData.profile_picture}
-                                    alt=""
+                                    src={useData.avatar || 'https://via.placeholder.com/150'}
+                                    alt="Avatar"
                                 />
-                                <h1 className="mt-3 text-2xl font-semibold">{lembagaSosialData.name}</h1>
-                                <p className="text-[#45c517]">{lembagaSosialData.location}</p>
+                                <h1 className="mt-3 text-2xl font-semibold">{useData.nama_user}</h1>
+                                <p className="text-[#45c517]">{useData.alamat}</p>
                                 <Link to="/edit-profil-ls">
                                     <button className="bg-[#45c517] font-semibold mt-5 py-2 px-3 rounded-full text-white">
                                         Edit Profil
@@ -58,7 +59,7 @@ const ProfileLS = () => {
                                 {[
                                     {
                                         label: "Email",
-                                        value: lembagaSosialData.email,
+                                        value: useData.email,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +79,7 @@ const ProfileLS = () => {
                                     },
                                     {
                                         label: "Nomor Telepon",
-                                        value: lembagaSosialData.phone_number,
+                                        value: useData.no_telp_user,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +99,7 @@ const ProfileLS = () => {
                                     },
                                     {
                                         label: "Deskripsi",
-                                        value: lembagaSosialData.deskripsi,
+                                        value: useData.deskripsi,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +119,7 @@ const ProfileLS = () => {
                                     },
                                     {
                                         label: "Alamat",
-                                        value: lembagaSosialData.address,
+                                        value: useData.alamat,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -137,8 +138,8 @@ const ProfileLS = () => {
                                         ),
                                     },
                                     {
-                                        label: "Lokasi",
-                                        value: lembagaSosialData.location,
+                                        label: "Nomor Rekening",
+                                        value: useData.no_rek,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"

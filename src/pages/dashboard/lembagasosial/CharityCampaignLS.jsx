@@ -1,12 +1,29 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SidebarLS from '../../../components/dashboard/lembagasosial/SidebarLS';
 import NavbarLS from '../../../components/dashboard/lembagasosial/NavbarLS';
 import CharityCardLS from '../../../components/dashboard/lembagasosial/CharityCardLS';
-import charityCampaignData from '../../../assets/user/charityCampaignData.json';
+import axios from 'axios'; // Import axios
 
 const CharityCampaignLS = () => {
+  // State untuk menyimpan data kampanye
+  const [charityCampaigns, setCharityCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true); // State untuk status loading
+
+  // Fetch data campaign dari API
+  useEffect(() => {
+    axios.get('http://localhost:8085/penggalangan')
+      .then(response => {
+        setCharityCampaigns(response.data); // Set data ke state
+        setLoading(false); // Set loading false setelah data diterima
+      })
+      .catch(error => {
+        console.error("There was an error fetching the charity campaigns!", error);
+        setLoading(false); // Set loading false jika ada error
+      });
+  }, []); // Empty dependency array berarti effect ini hanya dijalankan sekali setelah komponen mount
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -59,6 +76,10 @@ const CharityCampaignLS = () => {
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Menampilkan loading jika data sedang dimuat
+  }
+
   return (
     <div className="relative flex min-h-screen">
       <SidebarLS />
@@ -86,14 +107,14 @@ const CharityCampaignLS = () => {
 
             {/* Grid Container with Scroll Animation */}
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="flex flex-wrap gap-20"
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
             >
               {/* Map through your charity items */}
-              {charityCampaignData.map((campaign, index) => (
+              {charityCampaigns.map((campaign, index) => (
                 <motion.div
                   key={campaign.id}
                   variants={cardVariants}
@@ -105,12 +126,12 @@ const CharityCampaignLS = () => {
                   viewport={{ once: true }}
                 >
                   <CharityCardLS 
-                    id={campaign.id}
-                    image={campaign.campaign_image_url}
+                    id={campaign._id}
+                    image={campaign.filename[0]}
                     title={campaign.campaign_title}
-                    isActive={campaign.status === "aktif"}
+                    isActive={campaign.status === "active"}
                     targetDonation={campaign.target}
-                    collectedAmount={campaign.collected}
+                    collectedAmount={campaign.target}
                   />
                 </motion.div>
               ))}

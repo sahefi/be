@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Import Axios
@@ -6,7 +7,7 @@ import Navbar from '../../components/dashboard/Navbar';
 
 const PaymentMethod = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [invoiceNumber, setInvoiceNumber] = useState('');
 
@@ -18,7 +19,7 @@ const PaymentMethod = () => {
     };
 
     const location = useLocation();
-    const { total, idUser, idProduk } = location.state || {};
+    const { total, idUser, products, cartItems } = location.state || {}; // Assuming products is an array of items
 
     const [selectedMethod, setSelectedMethod] = useState({
         method: "Mandiri Virtual Account",
@@ -67,18 +68,35 @@ const PaymentMethod = () => {
         const newInvoice = generateInvoiceNumber();
         setInvoiceNumber(newInvoice);
 
-        const paymentData = {
-            id_user: idUser, // User ID from state
-            id_produk: idProduk, // Product ID from state
-            metode_pembayaran: selectedMethod.method,
-            jumlah_produk: 1, // Example quantity, update if dynamic
-            nomor_invoice: newInvoice,
-            total_harga: total, // Total price from state
-        };
+        let paymentData = [];
+        
+        if (cartItems) {
+            paymentData = cartItems.map((cart) => ({
+                id_user: idUser,
+                id_produk: cart.id,
+                metode_pembayaran: selectedMethod.method,
+                jumlah_produk: cart.quantity, // Get the quantity for each product
+                nomor_invoice: newInvoice,
+                total_harga: total, // Assuming the total price for the product is passed
+            }));
+        } else {
+            paymentData = products.map((product) => ({
+                id_user: idUser,
+                id_produk: product.id,
+                metode_pembayaran: selectedMethod.method,
+                jumlah_produk: product.quantity, // Get the quantity for each product
+                nomor_invoice: newInvoice,
+                total_harga: total, // Assuming the total price for the product is passed
+            }));
+        }
 
         try {
-            const response = await axios.post('http://localhost:8085/transaksi', paymentData); // Update API endpoint
-            console.log('Payment success:', response.data);
+            // Update your API to handle an array of payment data
+            await axios.post('http://localhost:8085/transaksi', paymentData);
+            alert('Payment success');
+            if (cartItems) {                
+            localStorage.removeItem('cart');
+            }
             setShowConfirmation(true);
         } catch (error) {
             console.error('Payment failed:', error.response || error);
@@ -199,83 +217,52 @@ const PaymentMethod = () => {
                                             className="text-green-600 font-semibold"
                                             onClick={() => navigator.clipboard.writeText(selectedMethod.code)}
                                         >
-                                            Salin Kode
+                                            Salin
                                         </button>
                                     </div>
                                 </div>
-                                <div
-                                    onClick={!isLoading ? handleConfirmPayment : undefined}
-                                    className={`${isLoading
-                                        ? 'bg-gray-400 cursor-not-allowed'
-                                        : 'hover:cursor-pointer hover:bg-green-600 bg-[#45c517]'
-                                        } p-1 py-2 text-center rounded-full`}
+                                <button
+                                    className="bg-green-500 w-full py-3 rounded-xl text-white font-semibold"
+                                    onClick={handleConfirmPayment}
+                                    disabled={isLoading}
                                 >
-                                    {isLoading ? (
-                                        <div className="flex items-center justify-center gap-2">
-                                            <svg
-                                                className="animate-spin h-5 w-5 text-white"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <circle
-                                                    className="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    strokeWidth="4"
-                                                />
-                                                <path
-                                                    className="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                />
-                                            </svg>
-                                            <span className="text-white text-base font-semibold">
-                                                Memproses...
-                                            </span>
-                                        </div>
-                                    ) : (
-                                        <h1 className="text-white text-base font-semibold">
-                                            Konfirmasi Pembayaran
-                                        </h1>
-                                    )}
-                                </div>
+                                    {isLoading ? "Processing..." : "Konfirmasi Pembayaran"}
+                                </button>
                             </div>
+
+                            {showConfirmation && (
+                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                    <div className="bg-white rounded-xl p-8 w-[400px] text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Pembayaran Berhasil!</h2>
+                                        <p className="text-gray-600 mb-4">Terima kasih atas pembayaran Anda</p>
+                                        <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                                            <p className="text-sm text-gray-600 mb-2">Nomor Invoice:</p>
+                                            <p className="text-lg font-bold text-gray-800">{invoiceNumber}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setShowConfirmation(false);
+                                                navigate('/home');
+                                            }}
+                                            className="bg-[#45c517] text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                                        >
+                                            Kembali
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </section>
                 </div>
-
-                {showConfirmation && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl p-8 w-[400px] text-center">
-                            <div className="flex justify-center mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <h2 className="text-2xl font-bold text-gray-800 mb-4">Pembayaran Berhasil!</h2>
-                            <p className="text-gray-600 mb-4">Terima kasih atas pembayaran Anda</p>
-                            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                                <p className="text-sm text-gray-600 mb-2">Nomor Invoice:</p>
-                                <p className="text-lg font-bold text-gray-800">{invoiceNumber}</p>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    setShowConfirmation(false);
-                                    navigate(-1);
-                                }}
-                                className="bg-[#45c517] text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300"
-                            >
-                                Kembali
-                            </button>
-                        </div>
-                    </div>
-                )}
             </section>
         </div>
     );
 };
 
 export default PaymentMethod;
+

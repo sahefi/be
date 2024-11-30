@@ -3,21 +3,19 @@ import Sidebar from "../../components/dashboard/Sidebar";
 import Navbar from "../../components/dashboard/Navbar";
 import { useState, useEffect } from 'react';
 import HistoryCard from "../../components/dashboard/profile/HistoryCard";
-import NoData from "../../components/dashboard/profile/NoData";
 import { Link } from "react-router-dom";
+import HistoryShare from "../../components/dashboard/profile/HistoryShare";
 
 const Profile = () => {
-    const user = JSON.parse(localStorage.getItem('user'));   
     const [profile, setProfile] = useState({});
-
-    // Memperbarui profile hanya saat komponen pertama kali dipasang (mount)
-    useEffect(() => {
-        if (user) {
-            setProfile(user);
-        }
-    }, [user]);  // Dependensi kosong memastikan efek ini hanya dijalankan sekali
-
     const [selectedNav, setSelectedNav] = useState('Riwayat Grab Meals');
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setProfile(JSON.parse(storedUser));
+        }
+    }, []);
 
     const handleNavClick = (nav) => {
         setSelectedNav(nav);
@@ -36,26 +34,35 @@ const Profile = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                    
                         <h1 className="mt-10 mx-10 text-2xl font-bold text-[#45c517] animate-fadeIn">
                             Profile
                         </h1>
                     </motion.div>
 
-                    {/* content */}
                     <section className="mx-10 my-5">
                         <div className="p-5 min-h-screen w-full bg-white shadow-md rounded-xl">
+                            {/* User Info */}
                             <div className="flex flex-col items-center text-center justify-center">
-                                <img className="w-36 h-36 object-cover rounded-full" src={profile?.avatar || '../../../../public/profile.png'} alt="" />
-                                <h1 className="mt-3 text-2xl font-semibold">{profile?.nama_user || 'User'}</h1>
-                                <p className="text-[#45c517]">{profile?.alamat || 'Malang, Indonesia'}</p>
+                                <img
+                                    className="w-36 h-36 object-cover rounded-full"
+                                    src={profile?.avatar || '/profile.png'}
+                                    alt="User Avatar"
+                                />
+                                <h1 className="mt-3 text-2xl font-semibold">
+                                    {profile?.nama_user || 'User'}
+                                </h1>
+                                <p className="text-[#45c517]">
+                                    {profile?.alamat || 'Malang, Indonesia'}
+                                </p>
                                 <Link to="/profil/edit-profil">
-                                    <button className="bg-[#45c517] font-semibold mt-5 py-2 px-3 rounded-full text-white">Edit Profile</button>
+                                    <button className="bg-[#45c517] font-semibold mt-5 py-2 px-3 rounded-full text-white">
+                                        Edit Profile
+                                    </button>
                                 </Link>
-                            </motion.div>
+                            </div>
 
-                            {/* navigate */}
-                            <motion.div 
+                            {/* Navigation */}
+                            <motion.div
                                 className="mt-5 flex justify-between"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -71,11 +78,10 @@ const Profile = () => {
                                     <motion.p
                                         key={nav}
                                         onClick={() => handleNavClick(nav)}
-                                        className={`hover:cursor-pointer pb-2 text-md font-semibold transition-colors duration-300 ${
-                                            selectedNav === nav
+                                        className={`hover:cursor-pointer pb-2 text-md font-semibold transition-colors duration-300 ${selectedNav === nav
                                                 ? "border-b-2 border-[#45c517] text-[#45c517]"
                                                 : "hover:text-[#45c517] hover:border-b-2 hover:border-[#45c517] text-gray-600"
-                                        }`}
+                                            }`}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                     >
@@ -84,15 +90,15 @@ const Profile = () => {
                                 ))}
                             </motion.div>
 
-                            {/* history card */}
-                            <motion.div 
+                            {/* History Card */}
+                            <motion.div
                                 className="mt-5 animate-slideUp"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.5 }}
                             >
                                 {selectedNav === "Riwayat Grab Meals" && (
-                                    <motion.div 
+                                    <motion.div
                                         className="p-4 w-full pb-5 bg-white shadow-md rounded-xl transform transition-transform duration-300 hover:-translate-y-2"
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
@@ -101,10 +107,20 @@ const Profile = () => {
                                         <HistoryCard />
                                     </motion.div>
                                 )}
-                                {selectedNav !== "Riwayat Grab Meals" && <NoData />}
+
+                                {selectedNav === "Riwayat Sharing Meals" && (
+                                    <motion.div
+                                        className="p-4 w-full pb-5 bg-white shadow-md rounded-xl transform transition-transform duration-300 hover:-translate-y-2"
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <HistoryShare />
+                                    </motion.div>
+                                )}
                             </motion.div>
                         </div>
-                    </motion.section>
+                    </section>
                 </div>
             </section>
         </div>

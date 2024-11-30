@@ -1,17 +1,19 @@
 import { motion } from 'framer-motion';
 import SidebarMitra from "../../../components/dashboard/mitra/SidebarMitra";
 import NavbarMitra from "../../../components/dashboard/mitra/NavbarMitra";
-import mitraData from "../../../assets/user/mitraData.json";
 import { Link } from "react-router-dom";
 
 const ProfileMitra = () => {
+    // Ambil data user dari localStorage
+    const useData = JSON.parse(localStorage.getItem('user')) || {};
+
     return (
         <div className="flex min-h-screen">
             <SidebarMitra />
 
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
-                    <NavbarMitra showSearchBar={true} />
+                    <NavbarMitra showSearchBar={false} />
 
                     <motion.h1
                         initial={{ opacity: 0, y: -20 }}
@@ -36,11 +38,11 @@ const ProfileMitra = () => {
                             >
                                 <img
                                     className="w-36 h-36 object-cover rounded-full"
-                                    src={mitraData.profile_picture}
-                                    alt=""
+                                    src={useData.avatar || 'https://via.placeholder.com/150'}
+                                    alt="Avatar"
                                 />
-                                <h1 className="mt-3 text-2xl font-semibold">{mitraData.name}</h1>
-                                <p className="text-[#45c517]">{mitraData.location}</p>
+                                <h1 className="mt-3 text-2xl font-semibold">{useData.nama_user}</h1>
+                                <p className="text-[#45c517]">{useData.alamat}</p>
                                 <Link to="/edit-profil-mitra">
                                     <button className="bg-[#45c517] font-semibold mt-5 py-2 px-3 rounded-full text-white">
                                         Edit Profil
@@ -58,7 +60,7 @@ const ProfileMitra = () => {
                                 {[
                                     {
                                         label: "Email",
-                                        value: mitraData.email,
+                                        value: useData.email,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +80,7 @@ const ProfileMitra = () => {
                                     },
                                     {
                                         label: "Nomor Telepon",
-                                        value: mitraData.phone_number,
+                                        value: useData.no_telp_user,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +100,7 @@ const ProfileMitra = () => {
                                     },
                                     {
                                         label: "Deskripsi",
-                                        value: mitraData.deskripsi,
+                                        value: useData.deskripsi,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +120,7 @@ const ProfileMitra = () => {
                                     },
                                     {
                                         label: "Alamat",
-                                        value: mitraData.address,
+                                        value: useData.alamat,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -137,8 +139,8 @@ const ProfileMitra = () => {
                                         ),
                                     },
                                     {
-                                        label: "Lokasi",
-                                        value: mitraData.location,
+                                        label: "Nomor Rekening",
+                                        value: useData.no_rek,
                                         icon: (
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"

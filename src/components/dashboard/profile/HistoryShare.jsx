@@ -2,37 +2,36 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import NoData from './NoData';
 
-
-const HistoryCard = () => {
-    const [transactions, setTransactions] = useState([]);
+const HistoryShare = () => {
+    const [products, setProducts] = useState([]);
 
     useEffect(() => {
         // Fetch data from the API
-        axios.get('http://localhost:8085/transaksi')
+        axios.get('http://localhost:8085/produk')
             .then(response => {
                 // Get user data from localStorage
                 const userData = JSON.parse(localStorage.getItem('user'));
                 console.log(userData);
 
                 if (userData) {
-                    const filteredTransactions = response.data.filter(transaction => transaction.user._id === userData.id);
-                    setTransactions(filteredTransactions); // Set only transactions related to the current user
+                    // Filter products related to the current user based on user ID
+                    const filteredProducts = response.data.filter(product => product.user.id === userData.id);
+                    setProducts(filteredProducts); // Set only products related to the current user
                 }
             })
             .catch(error => {
-                console.error('There was an error fetching the transaction data!', error);
+                console.error('There was an error fetching the product data!', error);
             });
     }, []);
 
-    // Return NoData component if there are no transactions
-    if (transactions.length === 0) {
+    if (products.length === 0) {
         return <NoData />;
     }
 
     return (
         <>
-            {transactions.map((transaction) => {
-                const { user, produk, jumlah_produk, createdAt } = transaction;
+            {products.map((product) => {
+                const { user, nama_produk, jumlah_produk, harga, filename, createdAt } = product;
                 const formattedDate = new Date(createdAt).toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: 'long',
@@ -40,19 +39,19 @@ const HistoryCard = () => {
                 });
 
                 return (
-                    <div key={transaction.id} className="mb-4">
+                    <div key={product._id} className="mb-4">
                         <p className="font-semibold mb-2">{formattedDate}</p>
                         <div className="flex gap-2">
                             {/* Product Image */}
                             <img 
                                 className="w-32 h-20 object-cover rounded-md" 
-                                src={produk.filename[0]} 
-                                alt={produk.nama_produk} 
+                                src={filename[0]} 
+                                alt={nama_produk} 
                             />
                             <div className="w-full flex justify-between">
                                 <div className="space-y-2">
-                                    <h1>{produk.nama_produk}</h1>
-                                    <p className="text-xs">{jumlah_produk} x Rp{produk.harga.toLocaleString()}</p>
+                                    <h1>{nama_produk}</h1>
+                                    <p className="text-xs">{jumlah_produk} x Rp{harga.toLocaleString()}</p>
                                     <div className="flex gap-3 items-center">
                                         {/* User Avatar */}
                                         <img 
@@ -65,7 +64,7 @@ const HistoryCard = () => {
                                 </div>
                                 <div className="flex flex-col items-end">
                                     <h1 className="text-md font-semibold">Total Harga</h1>
-                                    <h1>Rp{(produk.harga * jumlah_produk).toLocaleString()}</h1>
+                                    <h1>Rp{(harga * jumlah_produk).toLocaleString()}</h1>
                                 </div>
                             </div>
                         </div>
@@ -76,4 +75,4 @@ const HistoryCard = () => {
     );
 };
 
-export default HistoryCard;
+export default HistoryShare;

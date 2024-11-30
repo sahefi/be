@@ -4,23 +4,24 @@ import { useNavigate, useParams } from 'react-router-dom';
 import SidebarMitra from "../../../components/dashboard/mitra/SidebarMitra";
 import NavbarMitra from "../../../components/dashboard/mitra/NavbarMitra";
 import kotaData from "../../../assets/sharemeals/kotaData.json";
-import productMitra from "../../../assets/user/productMitra.json";
 import categoryList from '../../../../public/categoryList.json';  // Adjust path as needed
+import axios from "axios";
+import moment from "moment";
 
 
-const UpdateProductMitra = () => {
+const UpdateShareMeals = () => {
     // 1. State Declarations
     const [formData, setFormData] = useState({
-        productName: "",
-        description: "",
-        stock: 0,
-        price: "",
+        nama_produk: "",
+        deskripsi_produk: "",
+        jumlah_produk: 0,
+        harga: "",
         images: Array(5).fill(null),
         category: "",
         kota: "",
         kecamatan: "",
         kelurahan: "",
-        detail: "",
+        alamat: "",
         date: "",
         time: ""
     });
@@ -28,14 +29,18 @@ const UpdateProductMitra = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [error, setError] = useState(null);
+    const [images, setImages] = useState((null));
+    const [saveImages, setSaveImages] = useState([]);
 
     // 2. Hooks
     const navigate = useNavigate();
     const { id } = useParams();
 
+
     // 3. Derived State
     const kecamatanData = kotaData[formData.kota] ?? {};
     const kelurahanData = kecamatanData[formData.kecamatan] ?? [];
+
 
     // 4. Utility Functions
     const formatTimeForInput = (timeString) => {
@@ -43,10 +48,12 @@ const UpdateProductMitra = () => {
         return timeString.replace('.', ':');
     };
 
+
     const formatTimeForDisplay = (timeString) => {
         if (!timeString) return '';
         return timeString.replace(':', '.');
     };
+
 
     const formatDateForInput = (dateString) => {
         if (!dateString) return '';
@@ -54,11 +61,13 @@ const UpdateProductMitra = () => {
         return `${year}-${month}-${day}`;
     };
 
+
     const formatDateForDisplay = (dateString) => {
         if (!dateString) return '';
         const [year, month, day] = dateString.split('-');
         return `${day}-${month}-${year}`;
     };
+
 
     // 5. Effects
     useEffect(() => {
@@ -72,30 +81,32 @@ const UpdateProductMitra = () => {
         }
     }, []);
 
+
     useEffect(() => {
         const loadProduct = async () => {
             try {
-                const product = productMitra.find(item => item.id === +id);
-                if (!product) throw new Error("Produk tidak ditemukan");
+                const list = await axios.get(`http://localhost:8085/produk/${id}`);
+                if (!list) throw new Error("Produk tidak ditemukan");
+                const product = list.data                                            
 
-                const [kelurahan = "", kecamatan = "", kota = "", detail = ""] =
-                    product.address?.split(", ") ?? [];
 
                 setFormData({
                     ...formData,
-                    productName: product.productName ?? "",
-                    description: product.description ?? "",
-                    stock: product.stok ?? 0,
-                    price: product.price?.toString() ?? "",
-                    images: [product.image_url, ...Array(4).fill(null)],
-                    category: product.category ?? "",
-                    kota,
-                    kecamatan,
-                    kelurahan,
-                    detail,
-                    date: product.date ?? "",
-                    time: formatTimeForDisplay(product.timeOver) ?? "",
+                    nama_produk: product.nama_produk ?? "",
+                    deskripsi_produk: product.deskripsi_produk ?? "",
+                    jumlah_produk: product.jumlah_produk ?? 0,
+                    harga: product.harga?.toString() ?? "",
+                    images: [...(product.filename || []), ...Array(5 - (product.filename?.length || 0)).fill(null)].slice(0, 5),
+                    category: product.kategori_produk ?? "",
+                    kategori_produk:product.kategori_produk ?? "",
+                    kota : product.kota ,
+                    kecamatan : product.kecamatan,
+                    kelurahan : product.kelurahan,
+                    alamat : product.alamat,
+                    tanggal_pengambilan:  moment(product.tanggal_pengambilan).format('DD-MM-YYYY')  ?? "",                                        
+                    jam: formatTimeForDisplay(product.jam) ?? "",
                 });
+                                
             } catch (err) {
                 setErrorMessage(err.message);
             } finally {
@@ -103,7 +114,10 @@ const UpdateProductMitra = () => {
             }
         };
         loadProduct();
+        console.log(formData);
+        
     }, [id]);
+
 
     // 6. Event Handlers
     const updateField = (field, value) => {
@@ -113,57 +127,124 @@ const UpdateProductMitra = () => {
         }));
     };
 
-    const handleFileChange = (index, file) => {
-        if (!file || file.size > 5_000_000) {
-            alert("Ukuran file terlalu besar. Maksimal 5MB");
-            return;
-        }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const newImages = [...formData.images];
-            newImages[index] = reader.result;
-            updateField('images', newImages);
+    const handleFileChange = (e, index) => {
+        const files = Array.from(e.target.files); 
+      
+        setSaveImages((prevImages) => {
+          return [...prevImages, ...files]; 
+        });     
+                
+        
+        if (files && files.length > 0) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setFormData((prevFormData) => {             
+                const updatedImages = [...(prevFormData.images || [])]; 
+                console.log(updatedImages);
+                
+                // Perbarui gambar sesuai dengan indeks
+                updatedImages[index] = reader.result;
+
+                setImages(updatedImages); // Update state images
+            
+                return {
+                    ...prevFormData,
+                    images: updatedImages, 
+                };                
+                
+            });
         };
-        reader.readAsDataURL(file);
+          reader.readAsDataURL(files[0]); 
+        }
+      };
+      
+      const handleDeleteImage = (index) => {                
+        // Salin array gambar dari formData
+        setFormData((prevFormData) => {             
+            const updatedImages = [...(prevFormData.images || [])]; 
+            
+            // Ganti gambar pada indeks dengan null
+            updatedImages[index] = null;
+    
+            return {
+              ...prevFormData,
+              images: updatedImages, // Perbarui array images
+            };
+        });
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const requiredFields = ['productName', 'description', 'price', 'category'];
+    
+        const requiredFields = ['nama_produk', 'deskripsi_produk', 'harga', 'category'];
         const missingFields = requiredFields.some(field => !formData[field]);
-
-        if (missingFields || !formData.detail || !formData.date || !formData.time) {
+    
+        if (missingFields || !formData.alamat || !formData.tanggal_pengambilan || !formData.jam) {
             alert("Mohon lengkapi semua data yang diperlukan.");
             return;
         }
+    
+        try {                            
+            const formDataToSend = new FormData();
 
-        try {
-            const fullAddress = [formData.kelurahan, formData.kecamatan, formData.kota, formData.detail]
-                .filter(Boolean)
-                .join(", ");
-            const updatedProduct = {
-                id: +id,
-                ...formData,
-                stok: +formData.stock,
-                price: +formData.price,
-                image_url: formData.images[0],
-                address: fullAddress,
-                date: formData.date,
-                timeOver: formData.time,
-                updated_at: new Date().toISOString()
-            };
+            // Menambahkan data lainnya terlebih dahulu
+            formDataToSend.append("id", id);
+            formDataToSend.append("nama_produk", formData.nama_produk);
+            formDataToSend.append("deskripsi_produk", formData.deskripsi_produk);
+            formDataToSend.append("jumlah_produk", formData.jumlah_produk);
+            formDataToSend.append("harga", formData.harga);
+            formDataToSend.append("kategori_produk", formData.category);
+            formDataToSend.append("kota", formData.kota);
+            formDataToSend.append("kecamatan", formData.kecamatan);
+            formDataToSend.append("kelurahan", formData.kelurahan);
+            formDataToSend.append("alamat", formData.alamat);
+            formDataToSend.append("tanggal_pengambilan", formData.tanggal_pengambilan);
+            formDataToSend.append("jam", formData.jam);
+            formDataToSend.append("updated_at", new Date().toISOString());
 
-            console.log('Updating product:', updatedProduct);
+            // Menambahkan gambar-gambar yang sudah ada (dari filename)
+            if (formData.images && formData.images.length > 0 && formData.images != null) {
+                for (let i = 0; i < formData.images.length; i++) {
+                    const imageUrl = formData.images[i];
+                    
+                    
+                    if (imageUrl != null) {                        
+                        const response = await fetch(imageUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], `existing-image-${i}`, { type: blob.type });
+    
+                        
+                        formDataToSend.append("files", file);
+                    }                    
+                }
+            }
+        
+            // Menambahkan gambar-gambar
+            if (saveImages && saveImages.length > 0) {
+                for (let i = 0; i < saveImages.length; i++) {
+                    console.log(saveImages[i]);
+                    formDataToSend.append("files", saveImages[i]); // Menambahkan gambar ke FormData
+                }
+            }
+    
+            console.log('Updating product:', formDataToSend);
+    
+            // Make the API request to update the product
+            const response = await axios.put(`http://localhost:8085/produk/${id}`, formDataToSend, {
+                headers: {
+                  "Content-Type": "multipart/form-data", // Important for file uploads
+                },
+              });           
+            
             alert("Produk berhasil diperbarui!");
-            navigate("/share-meals");
+            navigate("/sharemeals-mitra");
         } catch (err) {
             console.error('Error updating product:', err);
             alert("Gagal memperbarui produk. Silakan coba lagi.");
         }
     };
-
     // 7. Render Conditions
     if (isLoading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
     if (errorMessage) return <div className="flex justify-center items-center min-h-screen text-red-500">{errorMessage}</div>;
@@ -173,8 +254,9 @@ const UpdateProductMitra = () => {
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
                     <NavbarMitra />
-                    <div className="mt-5 mx-10">
-                        <h1 className="text-[#45c517] text-2xl font-bold">Bagikan Produk</h1>
+                    <div className="mt-10 mx-10">
+                     
+
 
                         <section className="p-3 rounded-md bg-white shadow-md mt-5">
                             <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Informasi Produk dan Pengambilan</h1>
@@ -197,6 +279,7 @@ const UpdateProductMitra = () => {
                                                         newImages[0] = null;
                                                         updateField('images', newImages);
                                                     }}
+                                                    onChange={(e) => handleFileChange(e,0)}
                                                     className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
@@ -216,7 +299,7 @@ const UpdateProductMitra = () => {
                                                 <input
                                                     type="file"
                                                     accept="image/*"
-                                                    onChange={(e) => handleFileChange(0, e.target.files[0])}
+                                                    onChange={(e) => handleFileChange(e,0)}
                                                     className="hidden"
                                                 />
                                             </label>
@@ -231,10 +314,10 @@ const UpdateProductMitra = () => {
                                         <input
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                             type="text"
-                                            value={formData.productName}
+                                            value={formData.nama_produk}
                                             onChange={(e) => {
                                                 if (e.target.value.length <= 23) {
-                                                    updateField('productName', e.target.value);
+                                                    updateField('nama_produk', e.target.value);
                                                 }
                                             }}
                                             maxLength={23}
@@ -242,7 +325,7 @@ const UpdateProductMitra = () => {
                                             required
                                         />
                                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                                            {formData.productName.length}/23
+                                            {formData.nama_produk.length}/23
                                         </span>
                                     </div>
                                 </div>
@@ -251,160 +334,170 @@ const UpdateProductMitra = () => {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">Deskripsi Produk</label>
                                     <textarea
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                        rows="4"
-                                        value={formData.description}
-                                        onChange={(e) => updateField('description', e.target.value)}
-                                        placeholder="Masukkan deskripsi produk"
+                                        placeholder="Deskripsi produk"
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        rows="5"
+                                        value={formData.deskripsi_produk}
+                                        onChange={(e) => updateField('deskripsi_produk', e.target.value)}
                                         required
                                     ></textarea>
                                 </div>
 
-                                {/* Grid untuk Harga dan Stok */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Harga Produk</label>
-                                        <input
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            type="number"
-                                            value={formData.price}
-                                            onChange={(e) => updateField('price', e.target.value)}
-                                            placeholder="Masukkan harga"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Stok</label>
-                                        <input
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            type="number"
-                                            value={formData.stock}
-                                            onChange={(e) => updateField('stock', e.target.value)}
-                                            placeholder="Masukkan stok"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                                {/* Harga Produk */}
+                                <div className="flex flex-col">
+                                    <label>Harga Produk</label>
+                                    <input
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        type="number"
+                                        value={formData.harga}
+                                        onChange={(e) => updateField('harga', e.target.value)}
+                                        placeholder="Masukkan harga produk"
+                                        required
+                                    />
+                                </div>                                
 
                                 {/* Kategori */}
                                 <div>
-                                    <label className="block mb-2 font-medium text-gray-700">Kategori Produk</label>
+                                    <label className="block mb-2 font-medium text-gray-700">Kategori</label>
                                     <select
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                        value={formData.category}
+                                        value={formData.category || ''}
                                         onChange={(e) => updateField('category', e.target.value)}
                                         required
                                     >
                                         <option value="">Pilih Kategori</option>
-                                        {categoriesData.map((category) => (
-                                            <option key={category.id} value={category.name}>
-                                                {category.name}
-                                            </option>
-                                        ))}
+                                        {isLoading ? (
+                                            <option>Loading...</option>
+                                        ) : error ? (
+                                            <option>Error: {error}</option>
+                                        ) : (
+                                            categoriesData.map((categoryItem) => (
+                                                <option
+                                                    key={categoryItem?.id}
+                                                    value={categoryItem?.name}
+                                                >
+                                                    {categoryItem?.name}
+                                                </option>
+                                            ))
+                                        )}
                                     </select>
                                 </div>
 
-                                {/* Grid untuk Lokasi */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Kota</label>
-                                        <select
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            value={formData.kota}
-                                            onChange={(e) => {
-                                                updateField('kota', e.target.value);
-                                                updateField('kecamatan', '');
-                                                updateField('kelurahan', '');
-                                            }}
-                                            required
-                                        >
-                                            <option value="">Pilih Kota</option>
-                                            {Object.keys(kotaData).map((kota) => (
-                                                <option key={kota} value={kota}>{kota}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Kecamatan</label>
-                                        <select
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            value={formData.kecamatan}
-                                            onChange={(e) => {
-                                                updateField('kecamatan', e.target.value);
-                                                updateField('kelurahan', '');
-                                            }}
-                                            disabled={!formData.kota}
-                                            required
-                                        >
-                                            <option value="">Pilih Kecamatan</option>
-                                            {Object.keys(kecamatanData).map((kecamatan) => (
-                                                <option key={kecamatan} value={kecamatan}>{kecamatan}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Kelurahan</label>
-                                        <select
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            value={formData.kelurahan}
-                                            onChange={(e) => updateField('kelurahan', e.target.value)}
-                                            disabled={!formData.kecamatan}
-                                            required
-                                        >
-                                            <option value="">Pilih Kelurahan</option>
-                                            {kelurahanData.map((kelurahan) => (
-                                                <option key={kelurahan} value={kelurahan}>{kelurahan}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-
                                 {/* Lokasi Pengambilan */}
-                                <div>
-                                    <label className="block mb-2 font-medium text-gray-700">Lokasi Pengambilan</label>
+                                <div className="space-y-6">
+                                    <h2 className="text-lg font-medium text-gray-700">Lokasi Pengambilan</h2>
+
+                                    {/* Grid untuk Kota, Kecamatan, dan Kelurahan */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {/* Kota */}
+                                        <div>
+                                            <label className="block mb-2 font-medium text-gray-700">Kota</label>
+                                            <select
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                                value={formData.kota}
+                                                onChange={(e) => {
+                                                    updateField('kota', e.target.value);
+                                                    updateField('kecamatan', '');
+                                                    updateField('kelurahan', '');
+                                                }}
+                                                required
+                                            >
+                                                <option value="">Pilih Kota</option>
+                                                {Object.keys(kotaData).map((kota, index) => (
+                                                    <option key={index} value={kota}>
+                                                        {kota}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Kecamatan */}
+                                        <div>
+                                            <label className="block mb-2 font-medium text-gray-700">Kecamatan</label>
+                                            <select
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                                value={formData.kecamatan}
+                                                onChange={(e) => {
+                                                    updateField('kecamatan', e.target.value);
+                                                    updateField('kelurahan', '');
+                                                }}
+                                                required
+                                                disabled={!formData.kota}
+                                            >
+                                                <option value="">Pilih Kecamatan</option>
+                                                {Object.keys(kecamatanData).map((kecamatan, index) => (
+                                                    <option key={index} value={kecamatan}>
+                                                        {kecamatan}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Kelurahan */}
+                                        <div>
+                                            <label className="block mb-2 font-medium text-gray-700">Kelurahan</label>
+                                            <select
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                                value={formData.kelurahan}
+                                                onChange={(e) => updateField('kelurahan', e.target.value)}
+                                                required
+                                                disabled={!formData.kecamatan}
+                                            >
+                                                <option value="">Pilih Kelurahan</option>
+                                                {kelurahanData.map((kelurahan, index) => (
+                                                    <option key={index} value={kelurahan}>
+                                                        {kelurahan}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                <div className="flex flex-col">
+                                    <label>Alamat Lengkap</label>
                                     <input
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
                                         type="text"
-                                        value={formData.detail}
-                                        onChange={(e) => updateField('detail', e.target.value)}
-                                        placeholder="Masukkan lokasi pengambilan"
+                                        value={formData.alamat}
+                                        onChange={(e) => updateField('alamat', e.target.value)}
+                                        placeholder="Alamat Lengkap"
                                         required
                                     />
                                 </div>
 
-                                {/* Grid untuk Tanggal dan Waktu */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Tanggal Pengambilan</label>
-                                        <input
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            type="date"
-                                            value={formData.date}
-                                            onChange={(e) => updateField('date', e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block mb-2 font-medium text-gray-700">Waktu Pengambilan</label>
-                                        <input
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
-                                            type="time"
-                                            value={formData.time}
-                                            onChange={(e) => updateField('time', e.target.value)}
-                                            required
-                                        />
-                                    </div>
+                                {/* Pickup Fields */}
+                                <div className="flex flex-col">
+                                    <label>Tanggal Pengambilan</label>
+                                    <input
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        type="date"
+                                        value={formatDateForInput(formData.tanggal_pengambilan)}
+                                        onChange={(e) => updateField('tanggal_pengambilan', formatDateForDisplay(e.target.value))}
+                                        required
+                                    />
                                 </div>
 
-                                {/* Tombol Submit */}
+                                <div className="flex flex-col">
+                                    <label>Jam Pengambilan</label>
+                                    <input
+                                        className="rounded-2xl pl-3 border-2 border-green-300 p-1 mt-2"
+                                        type="time"
+                                        value={formatTimeForInput(formData.jam)}
+                                        onChange={(e) => updateField('jam', formatTimeForDisplay(e.target.value))}
+                                        required
+                                    />
+                                </div>
+
+                                {/* Submit Button */}
                                 <div className="flex justify-end">
                                     <button
-                                        className="px-6 py-2 text-white bg-[#45c517] rounded-lg hover:bg-[#3ba513] focus:outline-none focus:ring-2 focus:ring-[#45c517] focus:ring-offset-2 transition-colors duration-200"
                                         type="submit"
+                                        className="px-6 py-2 bg-[#45c517] text-white rounded-lg hover:bg-[#3ba513] focus:outline-none focus:ring-2 focus:ring-[#45c517] focus:ring-opacity-50"
                                     >
-                                        Update Produk
+                                        Simpan Perubahan
                                     </button>
                                 </div>
+                            </div>
                             </form>
                         </section>
                     </div>
@@ -415,4 +508,5 @@ const UpdateProductMitra = () => {
 };
 
 
-export default UpdateProductMitra
+export default UpdateShareMeals
+

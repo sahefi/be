@@ -13,7 +13,11 @@ const ProductCard = ({ product }) => {
 
                         <img
                             className="rounded w-full h-28 mb-3 object-cover"
-                            src={product.filename[0]}
+                            src={
+                                Array.isArray(product?.filename) && product.filename.length > 0
+                                  ? product.filename[0] // Jika filename adalah array dan memiliki elemen
+                                  : '/profile.png'       // Fallback ke gambar default
+                              }
                             alt={product.nama_produk}
                         />
                         <h1 className="font-bold">{product.nama_produk}</h1>

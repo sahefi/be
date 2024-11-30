@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import SidebarLS from '../../../components/dashboard/lembagasosial/SidebarLS';
 import NavbarLS from '../../../components/dashboard/lembagasosial/NavbarLS';
+import { useState } from 'react';
 
 const CreateCharityLS = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate();    
     const [image, setImage] = useState(null);
     const [campaignData, setCampaignData] = useState({
         campaign_title: '',
@@ -40,12 +42,52 @@ const CreateCharityLS = () => {
         setImage(null);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Add your submission logic here
-        console.log('Form submitted:', campaignData);
-        // After successful submission, redirect to charity campaign list
-        navigate('/charitycampaign-ls');
+    const handleSubmit = async (e) => {
+        const userData = JSON.parse(sessionStorage.getItem('user')) || {};
+        e.preventDefault();        
+        // Membuat FormData untuk mengirim data dengan file
+        const formData = new FormData();
+        formData.append('namaGalangDana', campaignData.campaign_title);
+        formData.append('deskripsi', campaignData.description);
+        formData.append('target', campaignData.target);
+        formData.append('lokasi', campaignData.location);
+        formData.append('kategori', campaignData.category);
+        formData.append('status', campaignData.status);
+        formData.append('tanggalMulai', campaignData.start_date);
+        formData.append('tanggalAkhir', campaignData.end_date);
+        formData.append('id_user', userData.id);
+
+        // Menambahkan gambar jika ada
+        if (image) {
+            const blob = dataURItoBlob(image);
+            const blobName = blob.name || `${campaignData.start_date}_${campaignData.campaign_title}_campaign-image.jpg`
+            formData.append('files', blob, blobName);
+        }
+
+        try {
+            const response = await axios.post('http://localhost:8085/penggalangan', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            alert('Form submitted successfully');
+            navigate('/charitycampaign-ls');
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        }
+    };
+
+    // Fungsi untuk mengonversi Data URL (base64) menjadi Blob
+    const dataURItoBlob = (dataURI) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ua = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ua[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
     };
 
     return (
@@ -121,7 +163,7 @@ const CreateCharityLS = () => {
                                     <div>
                                         <label className="block mb-2 font-medium text-gray-700">Target Dana</label>
                                         <input
-                                            type="text"
+                                            type="number"
                                             name="target"
                                             value={campaignData.target}
                                             onChange={handleInputChange}

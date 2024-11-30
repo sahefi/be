@@ -1,38 +1,54 @@
-// ShareMeals.jsx
 import { useEffect, useState } from 'react';
-import Sidebar from "../../../components/dashboard/Sidebar";
-import Navbar from "../../../components/dashboard/Navbar";
-import { motion } from "framer-motion";
-import CardShareMeals from "../../../components/dashboard/sharemeals/CardShareMeals";
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
-const ShareMeals = () => {
-  const [products, setProducts] = useState([]);  
+import Sidebar from '../../../components/dashboard/Sidebar';
+import Navbar from '../../../components/dashboard/Navbar';
+import CardShareMeals from '../../../components/dashboard/sharemeals/CardShareMeals';
 
+const ShareMeals = () => {
+  const [products, setProducts] = useState([]);
+
+  // Fetch products from the API
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:8085/produk");
-      setProducts(response.data); // Perbarui state dengan data dari API
+      const response = await axios.get('http://localhost:8085/produk');
+      setProducts(response.data); // Update state with fetched data
     } catch (error) {
-      console.error("Gagal memuat produk:", error);
-      alert("Terjadi kesalahan saat memuat produk.");
+      console.error('Gagal memuat produk:', error);
+      alert('Terjadi kesalahan saat memuat produk. Silakan coba lagi nanti.');
     }
   };
 
+  // Load products on component mount
   useEffect(() => {
-    fetchProducts(); // Muat data produk saat pertama kali render
+    fetchProducts();
   }, []);
+
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  };
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar without animation */}
+      {/* Sidebar */}
       <Sidebar />
 
+      {/* Main Section */}
       <section className="bg-[#f4fef1] w-full pl-60 pt-20">
         <div className="flex-grow">
+          {/* Navbar */}
           <Navbar />
 
+          {/* Main Content */}
           <motion.div
             className="p-10"
             variants={containerVariants}
@@ -48,20 +64,37 @@ const ShareMeals = () => {
             </motion.h1>
 
             {/* Products Section */}
-            <motion.section variants={containerVariants}>
+            <motion.section
+              className="mt-6"
+              variants={containerVariants}
+            >
               <motion.h2
                 className="text-xl font-semibold text-[#45c517] mb-6"
                 variants={itemVariants}
               >
-                Produk yang anda bagikan
-              </h2>
-              
+                Produk yang Anda Bagikan
+              </motion.h2>
+
+              {/* Product Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {products.map(product => (
-                  <CardShareMeals key={product.id} product={product} onDelete={fetchProducts} />
-                ))}
+                {products.length > 0 ? (
+                  products.map((product) => (
+                    <CardShareMeals
+                      key={product.id}
+                      product={product}
+                      onDelete={fetchProducts}
+                    />
+                  ))
+                ) : (
+                  <motion.p
+                    className="text-center text-gray-500 col-span-full"
+                    variants={itemVariants}
+                  >
+                    Tidak ada produk yang tersedia.
+                  </motion.p>
+                )}
               </div>
-            </section>
+            </motion.section>
 
             {/* Floating Button */}
             <motion.div
@@ -69,7 +102,7 @@ const ShareMeals = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{
-                type: "spring",
+                type: 'spring',
                 stiffness: 260,
                 damping: 20,
                 delay: 0.5,
@@ -80,7 +113,7 @@ const ShareMeals = () => {
                   className="bg-[#47cb18] hover:bg-green-600 text-white px-8 py-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl"
                   whileHover={{
                     scale: 1.05,
-                    boxShadow: "0 10px 25px rgba(71, 203, 24, 0.3)",
+                    boxShadow: '0 10px 25px rgba(71, 203, 24, 0.3)',
                   }}
                   whileTap={{ scale: 0.95 }}
                 >

@@ -4,8 +4,8 @@ import Sidebar from "../../../components/dashboard/Sidebar";
 import Navbar from "../../../components/dashboard/Navbar";
 import kotaData from "../../../assets/sharemeals/kotaData.json";
 import categoryList from '../../../../public/categoryList.json';  // Adjust path as needed
-import axios from "axios";
 import moment from "moment";
+import axios from "axios";
 
 
 const UpdateShareMeals = () => {
@@ -28,7 +28,7 @@ const UpdateShareMeals = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [error, setError] = useState(null);
-    const [images, setImages] = useState(Array(5).fill(null));
+    const [images, setImages] = useState((null));
     const [saveImages, setSaveImages] = useState([]);
 
     // 2. Hooks
@@ -132,25 +132,29 @@ const UpdateShareMeals = () => {
       
         setSaveImages((prevImages) => {
           return [...prevImages, ...files]; 
-        }); 
-        console.log(saveImages);
-        
+        });     
+                
         
         if (files && files.length > 0) {
           const reader = new FileReader();
           reader.onloadend = () => {
             setFormData((prevFormData) => {             
-              const updatedImages = [...(prevFormData.images || [])]; 
-              
-              // Perbarui gambar sesuai dengan indeks
-              updatedImages[index] = reader.result;
-        
-              return {
-                ...prevFormData,
-                images: updatedImages, // Perbarui images dengan data baru
-              };
+                const updatedImages = [...(prevFormData.images || [])]; 
+                console.log(updatedImages);
+                
+                // Perbarui gambar sesuai dengan indeks
+                updatedImages[index] = reader.result;
+
+                setImages(updatedImages); // Update state images
+            
+                return {
+                    ...prevFormData,
+                    images: updatedImages, 
+                };
+                console.log(formData);
+                
             });
-          };
+        };
           reader.readAsDataURL(files[0]); 
         }
       };
@@ -275,6 +279,7 @@ const UpdateShareMeals = () => {
                                                         newImages[0] = null;
                                                         updateField('images', newImages);
                                                     }}
+                                                    onChange={(e) => handleFileChange(e,0)}
                                                     className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
@@ -294,7 +299,7 @@ const UpdateShareMeals = () => {
                                                 <input
                                                     type="file"
                                                     accept="image/*"
-                                                    onChange={(e) => handleFileChange(0, e.target.files[0])}
+                                                    onChange={(e) => handleFileChange(e,0)}
                                                     className="hidden"
                                                 />
                                             </label>
@@ -349,40 +354,7 @@ const UpdateShareMeals = () => {
                                         placeholder="Masukkan harga produk"
                                         required
                                     />
-                                </div>
-
-                                {/* Foto Produk */}
-                                <div className="flex flex-col mt-4">
-                                    <label>Foto Produk</label>
-                                    <div className="flex gap-4 mt-2">
-                                        {formData.images.map((image, index) => (
-                                            <div key={index} className="relative w-24 h-24 border rounded-md flex items-center justify-center">
-                                                {image ? (
-                                                    <>
-                                                        <img src={image} alt={`Foto ${index + 1}`} className="w-full h-full object-cover rounded-md" 
-                                                        onClick={(e) => handleFileChange(e, index)}
-                                                        />
-                                                        <button
-                                                            className="absolute top-1 right-1 bg-[#45c517] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                                                            onClick={() => handleDeleteImage(index)}
-                                                            type="button"
-                                                        >×</button>
-                                                    </>
-                                                ) : (
-                                                    <label className="flex flex-col items-center justify-center cursor-pointer text-gray-500 bg-gray-100 w-full h-full rounded-md">
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            onChange={(e) => handleFileChange(e,index)}
-                                                            className="hidden"
-                                                        />
-                                                        <span className="text-xs">Tambah Foto {index + 1}</span>
-                                                    </label>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                </div>                                
 
                                 {/* Kategori */}
                                 <div>
@@ -525,6 +497,7 @@ const UpdateShareMeals = () => {
                                         Simpan Perubahan
                                     </button>
                                 </div>
+                            </div>
                             </form>
                         </section>
                     </div>

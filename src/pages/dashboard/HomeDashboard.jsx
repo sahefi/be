@@ -9,6 +9,7 @@ import charityData from '../../assets/charitycampaign/lembagaSosialData.json';
 import ArticleCard from "../../components/dashboard/article/ArticleCard";
 import articleData from "../../assets/blogarticle/articleData.json";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const HomeDashboard = () => {
   // Animation variants
@@ -45,26 +46,39 @@ const HomeDashboard = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [articles, setArticles] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Fetch products
-        const productResponse = await fetch('/productData.json');
-        if (!productResponse.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const productData = await productResponse.json();
-        setProducts(productData);
+        // Fetch products using axios
+        const productResponse = await axios.get('http://localhost:8085/produk');
+        setProducts(productResponse.data); // Assuming response.data contains the product data
       } catch (err) {
-        setError(err.message);
+        setError(err.message); // Catch and set error message
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Stop loading state
       }
     };
 
     fetchProducts();
-  }, []);
+  }, []); 
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        // Fetch Articles using axios
+        const articleResponse = await axios.get('http://localhost:8085/postingan');
+        setArticles(articleResponse.data); // Assuming response.data contains the product data
+      } catch (err) {
+        setError(err.message); // Catch and set error message
+      } finally {
+        setIsLoading(false); // Stop loading state
+      }
+    };
+
+    fetchArticles();
+  }, []); 
 
   const images = [
     {
@@ -237,7 +251,7 @@ const HomeDashboard = () => {
             <div className="flex flex-wrap justify-start gap-7">
 
 
-              {articleData.map((article) => (
+              {articles.map((article) => (
                 <motion.div
                   key={article.id}
                   variants={itemVariants}

@@ -1,15 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SidebarMitra from "../../../components/dashboard/mitra/SidebarMitra";
 import NavbarMitra from "../../../components/dashboard/mitra/NavbarMitra";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import ShareMealsCardMitra from "../../../components/dashboard/mitra/ShareMealsCardMitra";
-import productMitra from '../../../assets/user/productMitra.json';
 import { FaShareAlt } from "react-icons/fa"; // Contoh ikon dari react-icons
+import axios from "axios";
 
 
 const ShareMealsMitra = () => {
-  const [products] = useState(productMitra);
+  const [products, setProducts] = useState([]);
+  const fetchProducts = async () => {
+    try {      
+      const userData = JSON.parse(localStorage.getItem('user'));
+      
+      if (!userData) {
+        console.error('User data tidak ditemukan di localStorage.');
+        return;
+      }
+      
+      const response = await axios.get('http://localhost:8085/produk');
+      
+      const filteredProducts = response.data.filter(product => product?.user?.id === userData.id);
+      
+      setProducts(filteredProducts);
+    } catch (error) {
+      console.error('Gagal memuat produk:', error);
+      alert('Terjadi kesalahan saat memuat produk. Silakan coba lagi nanti.');
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   // Animation variants
   const containerVariants = {
@@ -78,7 +101,7 @@ const ShareMealsMitra = () => {
                       transition: { duration: 0.2 },
                     }}
                   >
-                    <ShareMealsCardMitra product={product} />
+                    <ShareMealsCardMitra product={product} onDelete={fetchProducts} />
                   </motion.div>
                 ))}
               </motion.div>
@@ -96,7 +119,7 @@ const ShareMealsMitra = () => {
                 delay: 0.5,
               }}
             >
-           
+
 
               <Link to="/sharemeals-form-mitra">
                 <motion.button

@@ -29,12 +29,17 @@ const LoginPage = () => {
       });
 
       if (response.status === 200) {
-        // Handle successful login (store token, redirect, etc.)
+        
         alert("Login successful!");
-        // Example: storing token in localStorage
-        localStorage.setItem("authToken", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        navigate("/home"); // Redirect to a protected page, e.g., dashboard
+        setTimeout(() => {      
+      
+          localStorage.setItem("authToken", response.data.token);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          sessionStorage.setItem("user", JSON.stringify(response.data.user));
+          
+          navigate("/home");
+      
+        }, 1000);         
       } else {
         setError("Login failed, please check your credentials.");
       }

@@ -1,17 +1,15 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
-import charityData from '../../../assets/charitycampaign/lembagaSosialData.json';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import Sidebar from '../../../components/dashboard/Sidebar';
 import Navbar from '../../../components/dashboard/Navbar';
 import { Link } from 'react-router-dom';
 
 const CharityTransaction = () => {
     const { id } = useParams();
-    const campaign = charityData.find((item) => item.id === parseInt(id));
-
-    if (!campaign) {
-        return <p>Data tidak ditemukan</p>;
-    }
+    const [campaign, setCampaign] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const [donationAmount, setDonationAmount] = useState('');
     const [selectedAmount, setSelectedAmount] = useState('');
@@ -29,6 +27,34 @@ const CharityTransaction = () => {
         setDonationAmount(numericValue ? formatNumber(numericValue) : '');
     };
 
+    useEffect(() => {
+        const fetchCampaign = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8085/penggalangan/${id}`);
+                setCampaign(response.data);
+            } catch (error) {
+                console.error('Error fetching campaign data:', error);
+                setError('Data tidak ditemukan');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCampaign();
+    }, [id]);
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
+    if (error) {
+        return <p>{error}</p>;
+    }
+
+    if (!campaign) {
+        return <p>Data tidak ditemukan</p>;
+    }
+
     return (
         <div className="flex min-h-screen">
             <Sidebar />
@@ -42,11 +68,11 @@ const CharityTransaction = () => {
                             <div className="md:w-1/2">
                                 <img
                                     className="w-full h-64 object-cover rounded-xl shadow-md"
-                                    src={campaign.campaign_image_url}
-                                    alt={campaign.campaign_title}
+                                    src={campaign.filename[0]}
+                                    alt={campaign.namaGalangDana}
                                 />
-                                <h1 className="font-bold text-2xl mt-6 text-gray-800">{campaign.campaign_title}</h1>
-                                <p className="text-gray-600 mt-2">{campaign.description}</p>
+                                <h1 className="font-bold text-2xl mt-6 text-gray-800">{campaign.namaGalangDana}</h1>
+                                <p className="text-gray-600 mt-2">{campaign.deskripsi}</p>
                             </div>
 
                             {/* Right Column: Donation Form */}

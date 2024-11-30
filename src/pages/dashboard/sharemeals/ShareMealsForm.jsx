@@ -15,7 +15,7 @@ const ShareMealsForm = () => {
   const [productDescription, setProductDescription] = useState("");
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState("");
-  const [images, setImages] = useState(Array(5).fill(null));
+  const [images, setImages] = useState((null));
   const [saveImages, setSaveImages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedKota, setSelectedKota] = useState("");
@@ -24,6 +24,7 @@ const ShareMealsForm = () => {
   const [pickupLocation, setPickupLocation] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [user, setUser] = useState({});
 
   // Data kategori
   const [categoriesData, setCategoriesData] = useState([]);
@@ -37,6 +38,8 @@ const ShareMealsForm = () => {
   const kelurahanData = selectedKecamatan ? kecamatanData[selectedKecamatan] : [];
 
   const handleFileChange = (e, index) => {
+    const userData = JSON.parse(localStorage.getItem('user')) || {};
+    setUser(userData);
     const files = Array.from(e.target.files); // Mengonversi FileList menjadi array
   
     setSaveImages((prevImages) => {
@@ -46,7 +49,7 @@ const ShareMealsForm = () => {
     if (files && files.length > 0) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result);
+        setImages(reader.result);
       };
       reader.readAsDataURL(files[0]); // Gunakan file pertama untuk preview
     }
@@ -93,6 +96,7 @@ const ShareMealsForm = () => {
     formData.append("alamat", pickupLocation);
     formData.append("tanggal_pengambilan", date);
     formData.append("jam", time);
+    formData.append("id_user", user.id);
   
     // Tambahkan semua file ke FormData
     if (saveImages && saveImages.length > 0) {
@@ -157,10 +161,10 @@ const ShareMealsForm = () => {
                   <label className="text-gray-700 font-medium mb-2">Foto Produk</label>
                   <div className="flex gap-4">
                     <div className="relative w-24 h-24 border-2 border-green-300 rounded-lg flex items-center justify-center overflow-hidden">
-                      {image ? (
+                      {images ? (
                         <>
                           <img
-                            src={image}
+                            src={images}
                             alt="Foto Produk"
                             className="w-full h-full object-cover"
                           />

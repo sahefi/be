@@ -12,7 +12,7 @@ const DetailProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const userData = JSON.parse(localStorage.getItem('user')) || {}; 
-
+  
   function handleQuantityChange(currentQty, jumlah_produk, isIncrease, harga) {
     let newQty;
 
@@ -57,11 +57,16 @@ const DetailProduct = () => {
     // Fetch product data using axios
     axios.get(`http://localhost:8085/produk/${id}`)
       .then((response) => {
-        const data = response.data;
-        setProduct(data);
+        const data = response.data;        
         if (data) {
           setTotal(data.harga * quantity);
         }
+        const updatedData = { 
+          ...data, 
+          user: userData 
+        };
+      
+        setProduct(updatedData);
       })
       .catch((error) => {
         console.error('Error fetching product data:', error);
@@ -74,7 +79,7 @@ const DetailProduct = () => {
 
   const handleAddToCart = () => {
     const cartItem = {
-      id: product.id,
+      id: product.id,      
       productName: product.nama_produk,
       harga: product.harga,
       quantity: quantity,
@@ -83,7 +88,6 @@ const DetailProduct = () => {
       owner: product?.user?.nama_user || 'User',
       photoProfile: product?.user?.avatar || '../../../../public/profile.png'
     };
-    console.log(cartItem);
     
   
     try {
@@ -145,8 +149,8 @@ const DetailProduct = () => {
                   />
                   <div className="flex items-center gap-3">
                     <img
-                      src={product?.user?.avatar || '../../../../public/profile.png'}
-                      alt={product?.user?.avatar || '../../../../public/profile.png'}
+                      src={product?.user.avatar}
+                      alt={product?.user?.avatar}
                       className="w-8 h-8 object-cover rounded-full"
                     />
                     <p className="text-xs font-semibold">{product?.user?.nama_user || 'User'}</p>

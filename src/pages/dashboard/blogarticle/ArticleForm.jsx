@@ -95,7 +95,6 @@ const ArticleForm = () => {
     };
 
     const handleSubmit = async (e) => {
-        
         e.preventDefault();
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -151,8 +150,12 @@ const ArticleForm = () => {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Upload Artikel';
                     showSuccess('Artikel berhasil diupload!');
-                }, 1000);
-                navigate('/blog')
+    
+                    // Delay before redirecting to the blog page
+                    setTimeout(() => {
+                        navigate('/blog');
+                    }, 1500); // Delay 1.5 seconds before navigating
+                }, 1000); // Show success message for 1 second
             } else {
                 throw new Error('Failed to upload article');
             }

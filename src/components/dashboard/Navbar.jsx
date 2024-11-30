@@ -1,18 +1,35 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaSearch } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 
 const Navbar = ({ showSearchBar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null); // Reference to the dropdown for detecting outside clicks
-
+  const navigate = useNavigate();
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   // Fetch user data from localStorage
   const userData = JSON.parse(localStorage.getItem('user')) || {}; // Default to empty object if not found
+
+  const handleLogout = () => {
+
+    alert("You are being logged out. Please wait...");
+
+
+    setTimeout(() => {
+
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      sessionStorage.clear();
+
+
+      navigate('/');
+
+    }, 1000);
+  };
 
   useEffect(() => {
     // Close dropdown when clicking outside
@@ -118,13 +135,13 @@ const Navbar = ({ showSearchBar }) => {
                 >
                   Help & Support
                 </li>
-                <Link to="/">
+                <a onClick={handleLogout}>
                   <li
                     className="px-4 py-2 hover:bg-[#45c517] hover:text-white cursor-pointer text-red-600"
                   >
                     Logout
                   </li>
-                </Link>
+                </a>
 
               </ul>
             </div>

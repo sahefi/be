@@ -122,7 +122,7 @@ const GrabMeals = () => {
 
             {/* Products Grid */}
             <motion.div 
-              className="flex gap-5 justify-between flex-wrap mt-5"
+              className="flex gap-5 flex-wrap mt-5"
               variants={itemVariants}
             >
               {filteredProducts.map((product) => (

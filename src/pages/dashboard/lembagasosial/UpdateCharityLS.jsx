@@ -1,112 +1,123 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 import SidebarLS from '../../../components/dashboard/lembagasosial/SidebarLS';
 import NavbarLS from '../../../components/dashboard/lembagasosial/NavbarLS';
-import charityCampaignData from '../../../assets/user/charityCampaignData.json';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 const UpdateCharityLS = () => {
-
-    const [showPreview, setShowPreview] = useState(false);
-    const [previewData, setPreviewData] = useState(null);
-
-    const clearError = (element) => {
-        const errorElement = document.getElementById(`${element.name}Error`);
-        if (errorElement) {
-            errorElement.textContent = '';
-        }
-    };
-
-    const [campaignData, setCampaignData] = useState({
-        campaign_title: '',
-        description: '',
-        target: '',
-        category: '',
-        start_date: '',
-        end_date: '',
-        location: '',
-        campaign_image_url: '',
-        status: ''
-    });
-    const [image, setImage] = useState(null); // Hanya satu gambar
-    const { id } = useParams();
     const navigate = useNavigate();
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImage(URL.createObjectURL(file));
-        }
-    };
+    const { id } = useParams(); // Get the campaign ID from the URL
+    const [image, setImage] = useState(null);
+    const [campaignData, setCampaignData] = useState({
+        namaGalangDana: '',
+        deskripsi: '',
+        target: '',
+        lokasi: '',
+        kategori: '',
+        status: '',
+        tanggalMulai: '',
+        tanggalAkhir: '',
+        filename: '',
+    });
 
     useEffect(() => {
-        const campaign = charityCampaignData.find(c => c.id === parseInt(id));
-        if (campaign) {
-            // Format dates to YYYY-MM-DD for date input
-            const formattedStartDate = campaign.start_date ? new Date(campaign.start_date).toISOString().split('T')[0] : '';
-            const formattedEndDate = campaign.end_date ? new Date(campaign.end_date).toISOString().split('T')[0] : '';
+        // Fetch the campaign data when the component mounts
+        const fetchCampaignData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8085/penggalangan/${id}`);
+                const formattedStartDate = new Date(response.data.tanggalMulai).toISOString().split('T')[0];  // YYYY-MM-DD
+                const formattedEndDate = new Date(response.data.tanggalAkhir).toISOString().split('T')[0];  // YYYY-MM-DD                
 
-            setCampaignData({
-                ...campaign,
-                start_date: formattedStartDate,
-                end_date: formattedEndDate
-            });
-
-            // Set image if exists
-            if (campaign.campaign_image_url) {
-                setImage(campaign.campaign_image_url);
+                setCampaignData({
+                    namaGalangDana: response.data.namaGalangDana,
+                    deskripsi: response.data.deskripsi,
+                    target: response.data.target,
+                    lokasi: response.data.lokasi,
+                    kategori: response.data.kategori,
+                    status: response.data.status,
+                    tanggalMulai: formattedStartDate,
+                    tanggalAkhir: formattedEndDate,
+                    filename: response.data.filename[0]
+                });
+                
+            } catch (error) {
+                console.error('Error fetching campaign data:', error);
             }
-        }
-    }, [id]);
+        };
 
+        fetchCampaignData();
+    }, [id]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setCampaignData(prevData => ({
-            ...prevData,
+        setCampaignData(prevState => ({
+            ...prevState,
             [name]: value
         }));
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleDeleteImage = () => {
-        setImage(null); // Menghapus gambar
+        setImage(null);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
+        const userData = JSON.parse(sessionStorage.getItem('user')) || {};
         e.preventDefault();
-        // Submit updated data to backend
-        console.log('Updated campaign data:', campaignData);
-        console.log('Updated image:', image);
-        // Navigate back to campaign list on success
-        navigate('/charitycampaign-ls');
+
+        // Create FormData to send data with file
+        const formData = new FormData();
+        formData.append('namaGalangDana', campaignData.namaGalangDana);
+        formData.append('deskripsi', campaignData.deskripsi);
+        formData.append('target', campaignData.target);
+        formData.append('lokasi', campaignData.lokasi);
+        formData.append('kategori', campaignData.kategori);
+        formData.append('status', campaignData.status);
+        formData.append('tanggalMulai', campaignData.tanggalMulai);
+        formData.append('tanggalAkhir', campaignData.tanggalAkhir);
+        formData.append('id_user', userData.id);
+
+        // Adding the image if available
+        if (image) {
+            const blob = dataURItoBlob(image);
+            const blobName = blob.name || `${campaignData.tanggalMulai}_${campaignData.namaGalangDana}_campaign-image.jpg`;
+            formData.append('files', blob, blobName);
+        }
+
+        try {
+            const response = await axios.put(`http://localhost:8085/penggalangan/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            alert('Campaign updated successfully');
+            navigate('/charitycampaign-ls'); // Redirect after success
+        } catch (error) {
+            console.error('Error updating campaign:', error);
+        }
     };
 
-    const validateForm = (formElement) => {
-        let isValid = true;
-        const fields = ['campaign_title', 'description', 'target', 'category', 'location', 'status', 'start_date', 'end_date'];
-
-        fields.forEach(field => {
-            if (!formElement[field].value.trim()) {
-                document.getElementById(`${field}Error`).textContent = 'Field ini harus diisi';
-                isValid = false;
-            }
-        });
-
-        if (!image) {
-            document.getElementById('imageError').textContent = 'Foto harus diunggah';
-            isValid = false;
+    // Function to convert Data URL (base64) to Blob
+    const dataURItoBlob = (dataURI) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ua = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ua[i] = byteString.charCodeAt(i);
         }
-
-        // Validate end date is after start date
-        const startDate = new Date(formElement.start_date.value);
-        const endDate = new Date(formElement.end_date.value);
-        if (endDate < startDate) {
-            document.getElementById('end_dateError').textContent = 'Tanggal berakhir harus setelah tanggal mulai';
-            isValid = false;
-        }
-
-        return isValid;
+        return new Blob([ab], { type: mimeString });
     };
 
     return (
@@ -119,12 +130,12 @@ const UpdateCharityLS = () => {
                         <h1 className="text-[#45c517] text-2xl font-bold">Update Charity Campaign</h1>
 
                         <section className="p-6 rounded-md bg-white shadow-md mt-5">
-                            <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Informasi Campaign</h1>
+                            <h1 className="mb-5 text-xl font-semibold text-[#45c517]">Campaign Information</h1>
                             <form className="space-y-6" onSubmit={handleSubmit}>
-                              
-                                {/* Foto Campaign */}
+
+                                {/* Photo Upload Section */}
                                 <div>
-                                    <label className="block mb-2 font-medium text-gray-700">Foto Campaign</label>
+                                    <label className="block mb-2 font-medium text-gray-700">Campaign Photo</label>
                                     <div className="mt-2">
                                         {image ? (
                                             <div className="relative w-full">
@@ -144,23 +155,22 @@ const UpdateCharityLS = () => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                                    <svg className="w-10 h-10 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                                    </svg>
-                                                    <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Klik untuk upload</span></p>
-                                                    <p className="text-xs text-gray-500">PNG, JPG (MAX. 1920x1080px)</p>
-                                                </div>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleFileChange}
-                                                    className="hidden"
-                                                />
-                                            </label>
+                                                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                                    <div className="relative w-full">
+                                                        <img
+                                                            src={campaignData.filename}
+                                                            alt="Campaign Preview"
+                                                            className="w-full h-72 object-cover rounded-lg border border-gray-200"
+                                                        />
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={handleFileChange}
+                                                            className="hidden"
+                                                        />
+                                                    </div>
+                                                </label>
                                         )}
-                                        <h2 id="imageError" className="text-red-500 text-sm mt-1"></h2>
                                     </div>
                                 </div>
 
@@ -170,13 +180,13 @@ const UpdateCharityLS = () => {
                                         <label className="block mb-2 font-medium text-gray-700">Nama Campaign</label>
                                         <input
                                             type="text"
-                                            name="campaign_title"
-                                            value={campaignData.campaign_title}
+                                            name="namaGalangDana"
+                                            value={campaignData.namaGalangDana}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                             placeholder="Masukkan nama campaign"
                                         />
-                                        <h2 id="campaign_titleError" className="text-red-500 text-sm mt-1"></h2>
+                                        <h2 id="namaGalangDanaError" className="text-red-500 text-sm mt-1"></h2>
                                     </div>
 
                                     <div>
@@ -196,22 +206,22 @@ const UpdateCharityLS = () => {
                                 <div>
                                     <label className="block mb-2 font-medium text-gray-700">Deskripsi Campaign</label>
                                     <textarea
-                                        name="description"
-                                        value={campaignData.description}
+                                        name="deskripsi"
+                                        value={campaignData.deskripsi}
                                         onChange={handleInputChange}
                                         rows="4"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                         placeholder="Masukkan deskripsi campaign"
                                     ></textarea>
-                                    <h2 id="descriptionError" className="text-red-500 text-sm mt-1"></h2>
+                                    <h2 id="deskripsiError" className="text-red-500 text-sm mt-1"></h2>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block mb-2 font-medium text-gray-700">Kategori</label>
                                         <select
-                                            name="category"
-                                            value={campaignData.category}
+                                            name="kategori"
+                                            value={campaignData.kategori}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                         >
@@ -221,7 +231,7 @@ const UpdateCharityLS = () => {
                                             <option value="Bencana Alam">Bencana Alam</option>
                                             <option value="Sosial">Sosial</option>
                                         </select>
-                                        <h2 id="categoryError" className="text-red-500 text-sm mt-1"></h2>
+                                        <h2 id="kategoriError" className="text-red-500 text-sm mt-1"></h2>
                                     </div>
 
                                     <div>
@@ -244,13 +254,13 @@ const UpdateCharityLS = () => {
                                     <label className="block mb-2 font-medium text-gray-700">Lokasi</label>
                                     <input
                                         type="text"
-                                        name="location"
-                                        value={campaignData.location}
+                                        name="lokasi"
+                                        value={campaignData.lokasi}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                         placeholder="Masukkan lokasi campaign"
                                     />
-                                    <h2 id="locationError" className="text-red-500 text-sm mt-1"></h2>
+                                    <h2 id="lokasiError" className="text-red-500 text-sm mt-1"></h2>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -258,28 +268,26 @@ const UpdateCharityLS = () => {
                                         <label className="block mb-2 font-medium text-gray-700">Tanggal Mulai</label>
                                         <input
                                             type="date"
-                                            name="start_date"
-                                            value={campaignData.start_date}
+                                            name="tanggalMulai"
+                                            value={campaignData.tanggalMulai}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                         />
-                                        <h2 id="start_dateError" className="text-red-500 text-sm mt-1"></h2>
+                                        <h2 id="tanggalMulaiError" className="text-red-500 text-sm mt-1"></h2>
                                     </div>
 
                                     <div>
                                         <label className="block mb-2 font-medium text-gray-700">Tanggal Berakhir</label>
                                         <input
                                             type="date"
-                                            name="end_date"
-                                            value={campaignData.end_date}
+                                            name="tanggalAkhir"
+                                            value={campaignData.tanggalAkhir}
                                             onChange={handleInputChange}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#45c517] focus:border-[#45c517]"
                                         />
-                                        <h2 id="end_dateError" className="text-red-500 text-sm mt-1"></h2>
+                                        <h2 id="tanggalAkhirError" className="text-red-500 text-sm mt-1"></h2>
                                     </div>
                                 </div>
-
-                                {/* Tombol Submit */}
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
@@ -295,6 +303,6 @@ const UpdateCharityLS = () => {
             </section>
         </div>
     );
-}
+};
 
 export default UpdateCharityLS;
