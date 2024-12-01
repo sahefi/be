@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SidebarAdmin from '../../../components/dashboard/admin/SidebarAdmin';
 import NavbarAdmin from '../../../components/dashboard/admin/NavbarAdmin';
-import newUser from '../../../assets/user/newUser.json';
+import axios from 'axios';
 
 const AccountList = () => {
     const [acceptedAccounts, setAcceptedAccounts] = useState([]);
@@ -10,8 +10,19 @@ const AccountList = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
     useEffect(() => {
-        const filtered = newUser.filter(user => user.status === "accepted");
-        setAcceptedAccounts(filtered);
+        function getUSer() {
+            const url = `http://localhost:8085/user`;
+      
+            axios.get(url)
+                .then(response => {                    
+                  const pendingRequests = response.data.filter(user => user.is_verif === '1');
+                  setAcceptedAccounts(pendingRequests);
+                })
+                .catch(error => {
+                    console.error('There was an error making the request:', error);
+                });
+        }   
+        getUSer();  
     }, []);
 
     const totalPages = Math.ceil(acceptedAccounts.length / rowsPerPage);
@@ -104,7 +115,7 @@ const AccountList = () => {
                                                 transition={{ duration: 0.2 }}
                                             >
                                                 <td className="px-4 py-4">{indexOfFirstRow + index + 1}</td>
-                                                <td className="px-4 py-4 max-w-[16rem] truncate">{account.name}</td>
+                                                <td className="px-4 py-4 max-w-[16rem] truncate">{account.nama_user}</td>
                                                 <td className="px-4 py-4">{account.email}</td>
                                                 <td className="px-4 py-4">
                                                     <motion.span 
@@ -115,11 +126,11 @@ const AccountList = () => {
                                                     </motion.span>
                                                 </td>
                                                 <td className="px-4 py-4">
-                                                    <motion.span 
+                                                    <motion.span
                                                         className="px-2 rounded-full text-white bg-green-500"
                                                         whileHover={{ scale: 1.05 }}
                                                     >
-                                                        {account.status}
+                                                        {account.is_verif === '1' ? 'Approve' : account.is_verif}
                                                     </motion.span>
                                                 </td>
                                             </motion.tr>

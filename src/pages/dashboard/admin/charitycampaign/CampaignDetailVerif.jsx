@@ -1,37 +1,70 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import SidebarAdmin from "../../../../components/dashboard/admin/SidebarAdmin";
 import Navbar from "../../../../components/dashboard/Navbar";
-import lembagaSosialData from "../../../../assets/charitycampaign/lembagaSosialData.json";
 
 const CampaignDetailVerif = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const location = useLocation();
-    // Add default status if not present
-    const campaign = {
-        ...lembagaSosialData.find(item => item.id === parseInt(id)),
-        status: location.state?.status || "Draft" // Get status from navigation state
-    };
-    if (!campaign) return <div>Campaign not found</div>;
 
+    const [campaign, setCampaign] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const handleDelete = (id) => {
-        console.log("Deleting campaign:", id);
-        // Add delete logic here
+    useEffect(() => {
+        const fetchCampaign = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8085/penggalangan/${id}`);
+                const campaignData = response.data;
+
+                // Tambahkan status berdasarkan `is_verif`
+                campaignData.status = campaignData.is_verif === "0"
+                    ? "Pending"
+                    : campaignData.is_verif === "1"
+                        ? "Approved"
+                        : "Rejected";
+
+                setCampaign(campaignData);
+                setLoading(false);
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+
+        fetchCampaign();
+    }, [id]);
+
+    const handleVerification = (status) => {
+        
+        const param = {
+            id: id,        
+            is_verif: status  
+        };    
+        
+        function updateCampaign() {
+            const url = 'http://localhost:8085/penggalangan-verif';  
+            axios.put(url, param)  
+                .then(response => {
+                    setCampaign(response.data);  
+                    alert('Verification status updated successfully');
+                    window.location.reload();
+                })
+                .catch(error => {
+                    alert('There was an error making the request');
+                });
+        }
+            
+        updateCampaign();                   
     };
 
-    const handleReject = (id) => {
-        console.log("Rejecting campaign:", id);
-        // Add reject logic here
-    };
-
-    const handleAccept = (id) => {
-        console.log("Accepting campaign:", id);
-        // Add accept logic here
-    };
-    // Get showButtons flag from location state
     const showButtons = location.state?.showButtons ?? true;
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!campaign) return <div>Campaign not found</div>;
 
     return (
         <div className="flex min-h-screen">
@@ -39,13 +72,11 @@ const CampaignDetailVerif = () => {
             <section className="bg-[#f4fef1] w-full pl-60 pt-20">
                 <div className="flex-grow">
                     <Navbar />
-                    <div className="mx-10 mt-5 gap-4">
-
-                        <h1 className="text-2xl font-bold text-[#45c517]">Detail Campaign</h1>
+                    <div className="mx-10 mt-5 gap-4 flex items-center">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="50"
-                            height="50"
+                            width="40"
+                            height="40"
                             fill="currentColor"
                             className="text-green-500 hover:cursor-pointer bi bi-arrow-left-short"
                             viewBox="0 0 16 16"
@@ -56,17 +87,18 @@ const CampaignDetailVerif = () => {
                                 d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
                             />
                         </svg>
+                        <h1 className="text-2xl font-bold text-[#45c517]">Detail Campaign</h1>
                     </div>
 
                     <section className="mx-10 my-5 bg-white rounded-xl shadow-md p-6">
-                        {/* Campaign Image */}
+                        {/* Gambar Campaign */}
                         <img
-                            src={campaign.campaign_image_url}
-                            alt={campaign.campaign_title}
+                            src={campaign.filename?.[0] || "/placeholder.jpg"}
+                            alt={campaign.namaGalangDana || "Gambar tidak tersedia"}
                             className="w-full h-64 object-cover rounded-xl mb-6"
                         />
 
-                        {/* Campaign Info */}
+                        {/* Informasi Campaign */}
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-4">
                                 <div>
@@ -75,11 +107,11 @@ const CampaignDetailVerif = () => {
                                     </label>
                                     <div className="flex items-center gap-3">
                                         <img
-                                            src={campaign.image_url}
-                                            alt={campaign.name}
+                                            src={campaign.user?.avatar || "/placeholder-avatar.jpg"}
+                                            alt={campaign.user?.nama_user || "Nama tidak tersedia"}
                                             className="w-10 h-10 rounded-full"
                                         />
-                                        <span className="text-gray-800">{campaign.name}</span>
+                                        <span className="text-gray-800">{campaign.user?.nama_user || "-"}</span>
                                     </div>
                                 </div>
 
@@ -88,7 +120,7 @@ const CampaignDetailVerif = () => {
                                         Judul Campaign
                                     </label>
                                     <input
-                                        value={campaign.campaign_title}
+                                        value={campaign.namaGalangDana || "-"}
                                         className="w-full rounded-lg border-2 border-green-200 px-4 py-2 bg-gray-50"
                                         readOnly
                                     />
@@ -99,7 +131,7 @@ const CampaignDetailVerif = () => {
                                         Kategori
                                     </label>
                                     <input
-                                        value={campaign.category}
+                                        value={campaign.kategori || "-"}
                                         className="w-full rounded-lg border-2 border-green-200 px-4 py-2 bg-gray-50"
                                         readOnly
                                     />
@@ -112,7 +144,7 @@ const CampaignDetailVerif = () => {
                                         Target Donasi
                                     </label>
                                     <input
-                                        value={`Rp${campaign.target.toLocaleString('id-ID')}`}
+                                        value={`Rp${(campaign.target || 0).toLocaleString("id-ID")}`}
                                         className="w-full rounded-lg border-2 border-green-200 px-4 py-2 bg-gray-50"
                                         readOnly
                                     />
@@ -124,79 +156,67 @@ const CampaignDetailVerif = () => {
                                     </label>
                                     <div className="grid grid-cols-2 gap-4">
                                         <input
-                                            value={campaign.start_date}
+                                            value={campaign.tanggalMulai ? new Date(campaign.tanggalMulai).toLocaleDateString("id-ID") : "-"}
                                             className="w-full rounded-lg border-2 border-green-200 px-4 py-2 bg-gray-50"
                                             readOnly
                                         />
                                         <input
-                                            value={campaign.end_date}
+                                            value={campaign.tanggalAkhir ? new Date(campaign.tanggalAkhir).toLocaleDateString("id-ID") : "-"}
                                             className="w-full rounded-lg border-2 border-green-200 px-4 py-2 bg-gray-50"
                                             readOnly
                                         />
                                     </div>
                                 </div>
-
-
                             </div>
                         </div>
 
-                        {/* Description */}
+                        {/* Deskripsi */}
                         <div className="mt-6">
                             <label className="block text-sm font-semibold text-gray-700 mb-1">
                                 Deskripsi Campaign
                             </label>
                             <textarea
-                                value={campaign.description}
+                                value={campaign.description || "Deskripsi tidak tersedia"}
                                 className="w-full rounded-lg border-2 border-green-200 px-4 py-2 bg-gray-50 min-h-[100px]"
                                 readOnly
                             />
                         </div>
 
-                        {/* Status Indicator */}
+                        {/* Status */}
                         <div className="mt-4">
                             <label className="block text-sm font-semibold text-gray-700 mb-1">
                                 Status Campaign
                             </label>
-                            <div className={`inline-block px-4 py-2 rounded-full ${campaign.status === "Rejected"
-                                ? "bg-red-100 text-red-600"
-                                : campaign.status === "Accepted"
-                                    ? "bg-green-100 text-green-600"
-                                    : "bg-yellow-100 text-yellow-600"
-                                }`}>
+                            <div
+                                className={`inline-block px-4 py-2 rounded-full ${campaign.status === "Rejected"
+                                        ? "bg-red-100 text-red-600"
+                                        : campaign.status === "Approved"
+                                            ? "bg-green-100 text-green-600"
+                                            : "bg-yellow-100 text-yellow-600"
+                                    }`}
+                            >
                                 {campaign.status}
                             </div>
                         </div>
 
-                        <div className="mt-8 flex justify-end gap-4">
-                            {showButtons && (
-                                <>
-                                    {campaign.status === "Accepted" && (
-                                        <button
-                                            onClick={() => handleDelete(campaign.id)}
-                                            className="px-6 py-2 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50"
-                                        >
-                                            Hapus
-                                        </button>
-                                    )}
-
-                                    {campaign.status === "Draft" && (
+                        {/* Tombol Aksi */}
+                        <div className="border-t pt-6 flex justify-end space-x-4">
+                                    {campaign.is_verif === '0' && (
                                         <>
                                             <button
-                                                onClick={() => handleReject(campaign.id)}
-                                                className="px-6 py-2 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50"
+                                                onClick={() => handleVerification('2')}
+                                                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
                                             >
-                                                Tolak
+                                                Tolak Verifikasi
                                             </button>
                                             <button
-                                                onClick={() => handleAccept(campaign.id)}
-                                                className="px-6 py-2 rounded-full bg-[#45c517] text-white hover:bg-green-600"
+                                                onClick={() => handleVerification('1')}
+                                                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
                                             >
-                                                Terima
+                                                Terima Verifikasi
                                             </button>
                                         </>
-                                    )}
-                                </>
-                            )}
+                                    )}                                
 
                             {!showButtons && (
                                 <div className="text-gray-500 italic">

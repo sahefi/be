@@ -11,11 +11,12 @@ const NavbarAdmin = ({ showSearchBar }) => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-
+  
+  const userData = JSON.parse(localStorage.getItem('user')) || {};   
 
 
   // Close dropdown when clicking outside
-  useEffect(() => {
+  useEffect(() => {    
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
@@ -69,7 +70,7 @@ const NavbarAdmin = ({ showSearchBar }) => {
         <div className="flex items-center gap-2 relative" ref={dropdownRef}>
           <div className="border-2 border-[#45c517] rounded-full">
             <img
-              src={adminData.admin.image_url}
+              src={'../../../../public/profile.png'}
               alt=""
               className="min-w-5 h-5 object-cover rounded-full"
             />
@@ -77,8 +78,8 @@ const NavbarAdmin = ({ showSearchBar }) => {
 
           <div className='flex items-center gap-3'>
             <div>
-              <h1>{adminData.admin.name}</h1>
-              <h1 className="text-xs">{adminData.admin.location}</h1>
+              <h1>{userData.nama_user}</h1>
+              <h1 className="text-xs">{userData.alamat || 'Malang,Indonesia'}</h1>
             </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"

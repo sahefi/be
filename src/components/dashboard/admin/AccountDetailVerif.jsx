@@ -1,35 +1,51 @@
 import { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import SidebarAdmin from "../../../components/dashboard/admin/SidebarAdmin";
 import NavbarAdmin from "../../../components/dashboard/admin/NavbarAdmin";
+import axios from 'axios';
 
 const AccountDetailVerif = () => {
-    const { id } = useParams();
-    const location = useLocation();
+    const { id } = useParams();    
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
 
     useEffect(() => {
-        if (location.state && location.state.userData) {
-            setUserData(location.state.userData);
-        } else {
-            fetchUserData();
-        }
-    }, [id, location.state]);
-
-    const fetchUserData = async () => {
-        try {
-            const response = await fetch(`/api/users/${id}`);
-            const data = await response.json();
-            setUserData(data);
-        } catch (error) {
-            console.error('Error fetching user data:', error);
-        }
-    };
+        function getUSer() {
+            const url = `http://localhost:8085/user/${id}`;
+    
+            axios.get(url)
+                .then(response => {                    
+                    setUserData(response.data);
+                })
+                .catch(error => {
+                    console.error('There was an error making the request:', error);
+                });
+        }   
+        getUSer();
+    }, [id]);
+    
 
     const handleVerification = (status) => {
-        console.log(`User ${id} ${status}`);
-        navigate('/admin/verification-requests');
+        
+        const param = {
+            id: id,        
+            is_verif: status  
+        };    
+        
+        function updateUser() {
+            const url = 'http://localhost:8085/user-verif';  
+            axios.put(url, param)  
+                .then(response => {
+                    setUserData(response.data);  
+                    alert('Verification status updated successfully');
+                    window.location.reload();
+                })
+                .catch(error => {
+                    alert('There was an error making the request');
+                });
+        }
+            
+        updateUser();                   
     };
 
     return (
@@ -62,32 +78,30 @@ const AccountDetailVerif = () => {
                                 <div className="flex items-start gap-8">
                                     <div className="w-48 h-48 overflow-hidden border-2 border-[#45c517] rounded-full">
                                         <img
-                                            src={userData.image_url}
+                                            src={userData.avatar}
                                             alt="Profile"
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div className="flex-1">
-                                        <h2 className="text-2xl font-bold mb-2">{userData.name}</h2>
-                                        <p className="text-gray-600">Username: {userData.username}</p>
+                                        <h2 className="text-2xl font-bold mb-2">{userData.nama_user}</h2>
+                                        <p className="text-gray-600">Username: {userData.nama_user}</p>
                                         <p className="text-gray-600">Email: {userData.email}</p>
-                                        <p className="text-gray-600">Phone: {userData.phone_number}</p>
+                                        <p className="text-gray-600">Phone: {userData.no_telp_user}</p>
                                         <p className="text-gray-600">Role: {userData.role}</p>
-                                        <p className="text-gray-600">Status: {userData.status}</p>
+                                        <p className="text-gray-600">
+                                            Status: {userData.is_verif === '0' ? 'Pending' : userData.is_verif === '1' ? 'Approve' : 'Reject'}
+                                        </p>
                                     </div>
                                 </div>
 
                                 {/* Location Information */}
                                 <div className="border-t pt-6">
                                     <h3 className="text-xl font-semibold mb-4">Informasi Lokasi </h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p className="text-gray-600">Lokasi Lembaga/Mitra</p>
-                                            <p className="font-medium">{userData.location}</p>
-                                        </div>
+                                    <div className="grid grid-cols-2 gap-4">                                        
                                         <div>
                                             <p className="text-gray-600">Alamat Lembaga/Mitra</p>
-                                            <p className="font-medium">{userData.address}</p>
+                                            <p className="font-medium">{userData.alamat}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -98,11 +112,11 @@ const AccountDetailVerif = () => {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-gray-600">Nama Pemilik Usaha</p>
-                                            <p className="font-medium">{userData.nama_pendiri}</p>
+                                            <p className="font-medium">{userData.nama_user}</p>
                                         </div>
                                         <div>
                                             <p className="text-gray-600">Nomor Rekening Perusahaan</p>
-                                            <p className="font-medium">{userData.nomor_rekening_perusahaan}</p>
+                                            <p className="font-medium">{userData.no_rek || '-'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -111,12 +125,12 @@ const AccountDetailVerif = () => {
                                 <div className="border-t pt-6">
                                     <h3 className="text-xl font-semibold mb-4">Deskripsi Lembaga/Mitra</h3>
                                     <p className="text-gray-700 whitespace-pre-line">
-                                        {userData.deskripsi}
+                                        {userData.deskripsi || '-'}
                                     </p>
                                 </div>
 
                                 {/* foto kantor */}
-                                <div className='w-full border-t pt-5'>
+                                {/* <div className='w-full border-t pt-5'>
                                     <h3 className="text-xl font-semibold mb-4">Foto Lembaga/Mitra</h3>
                                     <div className="flex justify-center">
                                         <img
@@ -125,10 +139,10 @@ const AccountDetailVerif = () => {
                                             src={userData.foto_kantor}
                                         />
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Documents */}
-                                <div className="border-t pt-6">
+                                {/* <div className="border-t pt-6">
                                     <h3 className="text-xl font-semibold mb-4">Dokumen Lembaga/Mitra</h3>
                                     <div className="border p-4 rounded-lg">
                                         <p className="text-gray-600 mb-2">Surat Izin</p>
@@ -138,22 +152,26 @@ const AccountDetailVerif = () => {
                                             className="w-full h-48 object-cover rounded"
                                         />
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Verification Buttons */}
                                 <div className="border-t pt-6 flex justify-end space-x-4">
-                                    <button
-                                        onClick={() => handleVerification('ditolak')}
-                                        className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                                    >
-                                        Tolak Verifikasi
-                                    </button>
-                                    <button
-                                        onClick={() => handleVerification('diterima')}
-                                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                                    >
-                                        Terima Verifikasi
-                                    </button>
+                                    {userData.is_verif === '0' && (
+                                        <>
+                                            <button
+                                                onClick={() => handleVerification('2')}
+                                                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                            >
+                                                Tolak Verifikasi
+                                            </button>
+                                            <button
+                                                onClick={() => handleVerification('1')}
+                                                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                            >
+                                                Terima Verifikasi
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
 
 

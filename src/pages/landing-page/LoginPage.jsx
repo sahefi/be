@@ -37,9 +37,20 @@ const LoginPage = () => {
           localStorage.setItem("user", JSON.stringify(response.data.user));
           sessionStorage.setItem("user", JSON.stringify(response.data.user));
           
-          navigate("/home");
+
+          if (response.data.user.role === 'pengguna') {       
+            console.log('hi');
+                 
+            navigate("/home");
+          } else if (response.data.user.role === 'lembaga sosial') {
+            navigate("/lembaga-sosial");
+          } else if (response.data.user.role === 'mitra') {
+            navigate("/mitra");
+          } else if (response.data.user.role === 'admin') {
+            navigate("/admin");
+          }
       
-        }, 1000);         
+        }, 500);         
       } else {
         setError("Login failed, please check your credentials.");
       }

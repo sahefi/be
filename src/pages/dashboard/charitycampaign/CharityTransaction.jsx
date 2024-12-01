@@ -109,7 +109,7 @@ const CharityTransaction = () => {
 
                                 <Link
                                     to={`/payment-charity/${id}`}
-                                    state={{ total: parseInt(donationAmount.replace(/\./g, '')) }}
+                                    state={{ total: parseInt(donationAmount.replace(/\./g, '')),idPenggalangan:id }}
                                     className="block"
                                 >
                                     <button

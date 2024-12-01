@@ -1,16 +1,17 @@
-import { useState } from "react";
-import { motion } from "framer-motion"; // Import motion
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion"; 
 import SidebarAdmin from "../../../../components/dashboard/admin/SidebarAdmin";
 import NavbarAdmin from "../../../../components/dashboard/admin/NavbarAdmin";
-import lembagaSosialData from "../../../../assets/charitycampaign/lembagaSosialData.json";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const CampaignVerif = () => {
   const [activeTab, setActiveTab] = useState("Draft");
+  const [campaigns, setCampaigns] = useState({ Draft: [], Accepted: [], Rejected: [] });
   const navigate = useNavigate();
 
   const handleDetailClick = (campaign) => {
-    navigate(`/campaign-detail-verif/${campaign.id}`, {
+    navigate(`/campaign-detail-verif/${campaign._id}`, {
       state: {
         status: activeTab,
         showButtons: activeTab !== "Rejected",
@@ -18,11 +19,27 @@ const CampaignVerif = () => {
     });
   };
 
-  const campaigns = {
-    Draft: [lembagaSosialData[0]],
-    Accepted: [lembagaSosialData[1]],
-    Rejected: [lembagaSosialData[2]],
-  };
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const response = await axios.get("http://localhost:8085/penggalangan");
+        const data = response.data;
+
+        // Filter campaigns berdasarkan status
+        const filteredCampaigns = {
+          Draft: data.filter((item) => item.is_verif === '0'),
+          Accepted: data.filter((item) => item.is_verif === '1'),
+          Rejected: data.filter((item) => item.is_verif === '2'),
+        };
+
+        setCampaigns(filteredCampaigns);
+      } catch (error) {
+        console.error("Error fetching campaigns:", error);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
 
   const tabVariants = {
     initial: { opacity: 0, y: 20 },
@@ -80,7 +97,7 @@ const CampaignVerif = () => {
                 <thead>
                   <tr className="text-left">
                     <th className="px-4 py-2 font-semibold w-2/6">Username</th>
-                    <th className="px-4 py-2 font-semibold w-1/12">ID</th>
+                    <th className="px-4 py-2 font-semibold w-1/6">ID</th>
                     <th className="px-4 py-2 font-semibold w-1/6">Kategori</th>
                     <th className="px-4 py-2 font-semibold w-1/4">
                       Judul Charity
@@ -88,7 +105,7 @@ const CampaignVerif = () => {
                   </tr>
                 </thead>
                 <motion.tbody>
-                  {campaigns[activeTab].map((campaign, index) => (
+                  {campaigns[activeTab]?.map((campaign, index) => (
                     <motion.tr
                       key={index}
                       className="hover:bg-gray-100 border-b"
@@ -98,17 +115,17 @@ const CampaignVerif = () => {
                     >
                       <td className="px-4 py-2 flex items-center gap-3">
                         <img
-                          src={campaign.image_url}
+                          src={campaign.avatar}
                           alt="Profile"
                           className="w-10 h-10 rounded-full"
                         />
-                        <span className="block truncate">{campaign.name}</span>
+                        <span className="block truncate">{campaign.user.nama_user}</span>
                       </td>
-                      <td className="px-4 py-2">{campaign.id}</td>
-                      <td className="px-4 py-2">{campaign.category}</td>
+                      <td className="px-4 py-2">{campaign._id}</td>
+                      <td className="px-4 py-2">{campaign.kategori}</td>
                       <td className="px-4 py-2">
                         <span className="block truncate">
-                          {campaign.campaign_title}
+                          {campaign.namaGalangDana}
                         </span>
                       </td>
                       <td className="px-4 py-2 text-right">

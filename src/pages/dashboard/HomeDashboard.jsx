@@ -7,7 +7,7 @@ import ProductCard from "../../components/dashboard/grabmeals/ProductCard";
 import CharityCard from "../../components/dashboard/charitycampaign/CharityCard";
 import charityData from '../../assets/charitycampaign/lembagaSosialData.json';
 import ArticleCard from "../../components/dashboard/article/ArticleCard";
-import articleData from "../../assets/blogarticle/articleData.json";
+
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -44,6 +44,7 @@ const HomeDashboard = () => {
   };
 
   const [products, setProducts] = useState([]);
+  const [penggalangan, setPenggalangan] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [articles, setArticles] = useState([]);
@@ -54,6 +55,22 @@ const HomeDashboard = () => {
         // Fetch products using axios
         const productResponse = await axios.get('http://localhost:8085/produk');
         setProducts(productResponse.data); // Assuming response.data contains the product data
+      } catch (err) {
+        setError(err.message); // Catch and set error message
+      } finally {
+        setIsLoading(false); // Stop loading state
+      }
+    };
+
+    fetchProducts();
+  }, []); 
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // Fetch products using axios
+        const penggalanganResponse = await axios.get('http://localhost:8085/penggalangan');
+        setPenggalangan(penggalanganResponse.data); // Assuming response.data contains the product data
       } catch (err) {
         setError(err.message); // Catch and set error message
       } finally {
@@ -216,7 +233,7 @@ const HomeDashboard = () => {
               className="flex justify-between gap-8"
               variants={containerVariants}
             >
-              {charityData.slice(0, 4).map((lembaga) => (
+              {penggalangan.slice(0, 4).map((lembaga) => (
                 <motion.div
                   key={lembaga.id}
                   variants={itemVariants}
@@ -226,15 +243,15 @@ const HomeDashboard = () => {
                   }}
                 >
                   <CharityCard
-                    id={lembaga.id}
-                    name={lembaga.name}
-                    location={lembaga.location}
-                    image_url={lembaga.image_url}
+                    id={lembaga._id}
+                    name={lembaga.user?.nama_user}
+                    location={lembaga.lokasi}
+                    image_url={lembaga.user?.avatar}
                     campaign={{
-                      title: lembaga.campaign_title,
-                      collected: lembaga.collected,
+                      title: lembaga.namaGalangDana,
+                      collected: lembaga.target,
                       target: lembaga.target,
-                      campaign_image_url: lembaga.campaign_image_url,
+                      campaign_image_url: lembaga.filename[0],
                     }}
                   />
                 </motion.div>

@@ -4,19 +4,45 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import SidebarAdmin from '../../../components/dashboard/admin/SidebarAdmin';
 import NavbarAdmin from '../../../components/dashboard/admin/NavbarAdmin';
 import newUserData from '../../../assets/user/newUser.json';
+import axios from 'axios';
 
 const AdminDashboard = () => {
   const navigate = useNavigate(); // Initialize navigate
-
+  const [total,setTotal] = useState({});
   const handleDetailClick = (request) => {
-    navigate(`/account-verif/${request.id}`, { state: { userData: request } });
+    navigate(`/account-verif/${request}`);
   };
+
+  useEffect(() => {
+    function getCountData() {
+        const url = `http://localhost:8085/admin`;
+
+        axios.get(url)
+            .then(response => {                    
+                setTotal(response.data);
+            })
+            .catch(error => {
+                console.error('There was an error making the request:', error);
+            });
+    }   
+    getCountData();
+}, []);
+
 
   const [verificationRequests, setVerificationRequests] = useState([]);
   useEffect(() => {
-    // Filter only pending verification requests from newUser.json
-    const pendingRequests = newUserData.filter(user => user.status === 'pending');
-    setVerificationRequests(pendingRequests);
+    function getUSer() {
+      const url = `http://localhost:8085/user`;
+
+      axios.get(url)
+          .then(response => {                               
+            setVerificationRequests(response.data);
+          })
+          .catch(error => {
+              console.error('There was an error making the request:', error);
+          });
+  }   
+  getUSer();    
   }, []);
 
   // Variants for animations
@@ -81,18 +107,18 @@ const AdminDashboard = () => {
                   <svg width="48" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" className="mb-3 p-2 bg-[#f4fef1] rounded-full" fill="green">
                     <path d="M14 1.33v13.34h-1.33v-4.67H10V5.33c0-2.21 1.79-4 4-4zM12.67 3c-.55.31-1.33 1.1-1.33 2.33v3.34h1.33V3zM6 9.27v5.4H4.67v-5.4A3.33 3.33 0 012 6V2h1.33v4.67h1.34V2H6v4.67h1.33V2H8.67v4c0 1.61-1.15 2.96-2.67 3.27z" />
                   </svg>
-                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>68</h1>
+                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>{total.produkCount || '0'}</h1>
                   <div className='flex justify-between'>
                     <p className='font-semibold text-xs group-hover:text-white'>Active Meals</p>
                     <p className='font-semibold text-xs text-[#45c517] group-hover:text-white'>+32%</p>
                   </div>
                 </motion.div>
 
-                <motion.div variants={cardVariants} className='group p-3 w-[48%] bg-white rounded-xl hover:cursor-pointer hover:bg-[#45c517] shadow-md'>
+                <motion.div variants={cardVariants || '0'} className='group p-3 w-[48%] bg-white rounded-xl hover:cursor-pointer hover:bg-[#45c517] shadow-md'>
                   <svg width="48" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mb-3 p-2 bg-[#f4fef1] rounded-full" fill="green">
                     <path d="M5.00488 9.00281C5.55717 9.00281 6.00488 9.45052 6.00488 10.0028C7.63965 10.0028 9.14352 10.5632 10.3349 11.5023L12.5049 11.5028C13.8375 11.5028 15.0348 12.0821 15.8588 13.0025L19.0049 13.0028C20.9972 13.0028 22.7173 14.1681 23.521 15.8542C21.1562 18.9748 17.3268 21.0028 13.0049 21.0028C10.2142 21.0028 7.85466 20.3996 5.944 19.3449C5.80557 19.7284 5.43727 20.0028 5.00488 20.0028H2.00488C1.4526 20.0028 1.00488 19.5551 1.00488 19.0028V10.0028C1.00488 9.45052 1.4526 9.00281 2.00488 9.00281H5.00488ZM6.00589 12.0028L6.00488 17.0248L6.05024 17.0573C7.84406 18.3177 10.183 19.0028 13.0049 19.0028C16.0089 19.0028 18.8035 17.8472 20.84 15.8734L20.9729 15.7398L20.8537 15.6394C20.3897 15.2764 19.8205 15.0512 19.2099 15.0097L19.0049 15.0028L16.8934 15.0028C16.9664 15.3244 17.0049 15.6591 17.0049 16.0028V17.0028H8.00488V15.0028L14.7949 15.0018L14.7605 14.9233C14.38 14.1297 13.593 13.5681 12.6693 13.5081L12.5049 13.5028L9.57547 13.5027C8.66823 12.5773 7.40412 12.0031 6.00589 12.0028ZM4.00488 11.0028H3.00488V18.0028H4.00488V11.0028ZM18.0049 5.00281C19.6617 5.00281 21.0049 6.34595 21.0049 8.00281C21.0049 9.65966 19.6617 11.0028 18.0049 11.0028C16.348 11.0028 15.0049 9.65966 15.0049 8.00281C15.0049 6.34595 16.348 5.00281 18.0049 5.00281Z" />
                   </svg>
-                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>14</h1>
+                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>{total.penggalanganCount || '0'}</h1>
                   <div className='flex justify-between'>
                     <p className='font-semibold text-xs group-hover:text-white'>Active Campaign</p>
                     <p className='font-semibold text-xs text-[#45c517] group-hover:text-white'>+12%</p>
@@ -103,7 +129,7 @@ const AdminDashboard = () => {
                   <svg width="48" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mb-3 p-2 bg-[#f4fef1] rounded-full" fill="green">
                     <path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13Z" />
                   </svg>
-                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>176</h1>
+                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>{total.userCount || '0'}</h1>
                   <div className='flex justify-between'>
                     <p className='font-semibold text-xs group-hover:text-white'>Total Users</p>
                     <p className='font-semibold text-xs text-[#45c517] group-hover:text-white'>+15%</p>
@@ -114,7 +140,7 @@ const AdminDashboard = () => {
                   <svg width="48" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="mb-3 p-2 bg-[#f4fef1] rounded-full" fill="green">
                     <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z" />
                   </svg>
-                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>54</h1>
+                  <h1 className='text-2xl font-semibold mb-2 text-[#45c517] group-hover:text-white'>{total.postinganCount || '0'}</h1>
                   <div className='flex justify-between'>
                     <p className='font-semibold text-xs group-hover:text-white'>Active Articles</p>
                     <p className='font-semibold text-xs text-[#45c517] group-hover:text-white'>+7%</p>
@@ -139,7 +165,7 @@ const AdminDashboard = () => {
                   <div className='flex items-end justify-between'>
                     <div>
                       <p className='text-gray-500 text-sm'>Total Revenue</p>
-                      <h3 className='text-2xl font-bold text-[#45c517]'>Rp2.450.000</h3>
+                      <h3 className='text-2xl font-bold text-[#45c517]'>Rp{total.transaksiProduct?.toLocaleString('id-ID') || 0}</h3>
                     </div>
                     <div className='flex items-center gap-1 text-[#45c517] text-sm'>
                       <span>+24%</span>
@@ -161,7 +187,7 @@ const AdminDashboard = () => {
                   <div className='flex items-end justify-between'>
                     <div>
                       <p className='text-gray-500 text-sm'>Total Donasi</p>
-                      <h3 className='text-2xl font-bold text-[#45c517]'>Rp5.670.000</h3>
+                      <h3 className='text-2xl font-bold text-[#45c517]'>Rp{total.transaksiPenggalangan?.toLocaleString('id-ID') || 0}</h3>
                     </div>
                     <div className='flex items-center gap-1 text-[#45c517] text-sm'>
                       <span>+35%</span>
@@ -196,21 +222,22 @@ const AdminDashboard = () => {
                     </thead>
                     <tbody>
                       {verificationRequests.map((request, index) => (
-                        <tr key={request.id} className='hover:bg-gray-100'>
+                        <tr key={request._id} className='hover:bg-gray-100'>
                           <td className='px-4 py-2'>{index + 1}</td>
-                          <td className='px-4 py-2 truncate'>{request.name}</td> {/* Removed width here */}
+                          <td className='px-4 py-2 truncate'>{request.nama_user}</td> {/* Removed width here */}
                           <td className='px-4 py-2'>{request.email}</td>
                           <td className='px-4 py-2'>{request.role}</td>
                           <td className='px-4 py-2'>
                             <span className={`px-3 text-sm py-1 rounded-full text-white 
-            ${request.status === 'pending' ? 'bg-yellow-500' :
-                                request.status === 'approved' ? 'bg-green-500' : 'bg-red-500'}`}>
-                              {request.status}
+            ${request.is_verif === '0' ? 'bg-yellow-500' :
+                                request.is_verif === '1' ? 'bg-green-500' : 'bg-red-500'}`}>
+                              {request.is_verif === '0' ? 'Pending' :
+                                request.is_verif === '1' ? 'Approve' : 'Rejected'}
                             </span>
                           </td>
                           <td>
                             <button
-                              onClick={() => handleDetailClick(request)}
+                              onClick={() => handleDetailClick(request._id)}
                               className='px-5 text-sm py-1 bg-[#45c517] text-white rounded-full hover:bg-[#3ba913]'
                             >
                               Detail

@@ -49,6 +49,7 @@ import CreateCharityLS from './pages/dashboard/lembagasosial/CreateCharityLS';
 import AccountVerifForm from './pages/dashboard/AccountVerifForm';
 import ProtectedRoute from './pages/Auth/ProtectedRoute';
 import Forbidden from './pages/Auth/Forbidden';
+import PaymentMethodCharity from './pages/dashboard/PaymentMethodCharity';
 
 const App = () => {
 
@@ -79,13 +80,14 @@ const App = () => {
           <Route path="/article-form" element={<ArticleForm />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/payment-product/:id" element={<PaymentMethod />} />
-          <Route path="/payment-charity/:id" element={<PaymentMethod />} />
+          <Route path="/payment-charity/:id" element={<PaymentMethodCharity />} />
           <Route path="/charity-transaction/:id" element={<CharityTransaction />} />
           <Route path="/share-meals/form" element={<ShareMealsForm />} />
           <Route path="/profil/edit-profil" element={<EditProfil />} />
           <Route path="/share-meals/update/:id" element={<UpdateShareMeals />} />
           </Route>
 
+          <Route element={<ProtectedRoute allowedRoles={['admin']} userRole={userData.role} />}>
           <Route path="/account-list" element={<AccountList />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/campaign-verif" element={<CampaignVerif />} />
@@ -93,7 +95,8 @@ const App = () => {
           <Route path="/article-verif" element={<BlogArticleVerif />} />
           <Route path="/article-detail-verif/:id" element={<ArticleVerifDetail />} />
           <Route path="/account-verif/:id" element={<AccountDetailVerif />} />
-
+          </Route>
+          
           <Route element={<ProtectedRoute allowedRoles={['mitra']} userRole={userData.role} />}>
           <Route path="/edit-profil-mitra" element={<EditProfilMitra />} />
           <Route path="/mitra" element={<DashboardMitra />} />
@@ -102,10 +105,9 @@ const App = () => {
           <Route path="/profile-mitra" element={<ProfileMitra />} />
           <Route path="/update-product/:id" element={<UpdateProductMitra />} />
           </Route>
-
           <Route path="/verif-form-mitra" element={<AccountVerifForm />} />
 
-
+          <Route element={<ProtectedRoute allowedRoles={['pengguna']} userRole={userData.role} />}>
           <Route path="/lembaga-sosial" element={<DashboardLS />} />
           <Route path="/charitycampaign-ls" element={<CharityCampaignLS />} />
           <Route path="/update-charity-ls/:id" element={<UpdateCharityLS />} />
@@ -113,6 +115,7 @@ const App = () => {
           <Route path="/verif-form-ls" element={<AccountVerifFormLS />} />
           <Route path="/edit-profil-ls" element={<EditProfileLS />} />
           <Route path="/create-charity-ls" element={<CreateCharityLS />} />
+          </Route>
 
 
         </Routes>

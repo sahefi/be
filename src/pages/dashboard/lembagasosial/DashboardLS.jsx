@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import charityIn from '../../../assets/user/charityIn.json';
 import { IoCloseOutline, IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
+import axios from 'axios';
+import moment from 'moment';
 
 const VerificationPopup = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
@@ -50,29 +52,73 @@ const VerificationPopup = ({ isOpen, onClose }) => {
     );
 };
 const DashboardLS = () => {
+    const userData = JSON.parse(sessionStorage.getItem('user')) || {};
     const [selectedTransaksi, setSelectedTransaksi] = useState(null);
     const [allTransaksi, setAllTransaksi] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [transaksiPerPage, setTransaksiPerPage] = useState(15);
     const [showTransaksiPopup, setShowTransaksiPopup] = useState(false);
+    const [totalHarga,setTotalHarga] = useState({});
+    const [total,setTotal] = useState({});
 
     useEffect(() => {
-        // Flatten all transactions from all users into a single array
-        const flattenedTransaksi = charityIn.flatMap(user =>
-            user.transaksi.map(transaksi => ({
-                ...transaksi,
-                user: {
-                    name: user.name,
-                    phone_number: user.phone_number,
-                }
-            }))
-        );
-        // Sort by date (descending)
-        flattenedTransaksi.sort((a, b) => new Date(b.date) - new Date(a.date));
-        setAllTransaksi(flattenedTransaksi);
-        setTotalPages(Math.ceil(flattenedTransaksi.length / transaksiPerPage));
-    }, [transaksiPerPage]);
+        function getCountData() {
+            const url = `http://localhost:8085/penggalangan/count/${userData.id}`;
+
+            axios.get(url)
+                .then(response => {                    
+                    setTotal(response.data);
+                })
+                .catch(error => {
+                    console.error('There was an error making the request:', error);
+                });
+        }
+
+        // Call the function inside the useEffect
+        getCountData();
+    }, []);
+
+    useEffect(() => {
+        function getCountData() {
+            const url = `http://localhost:8085/transaksi-p/count/${userData.id}`;
+
+            axios.get(url)
+                .then(response => {                    
+                    setTotalHarga(response.data);
+                })
+                .catch(error => {
+                    console.error('There was an error making the request:', error);
+                });
+        }
+
+        // Call the function inside the useEffect
+        getCountData();
+    }, []);
+
+    useEffect(() => {
+        axios
+          .get("http://localhost:8085/transaksi-p")
+          .then((response) => {
+            if (userData) {
+              const filteredTransactions = response.data.filter(
+                (transaction) => transaction.user._id === userData.id
+              );
+              // Sort transactions by date (descending)
+              filteredTransactions.sort(
+                (a, b) => new Date(b.date) - new Date(a.date)
+              );
+              setAllTransaksi(filteredTransactions);              
+              
+              setTotalPages(
+                Math.ceil(filteredTransactions.length / transaksiPerPage)
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("There was an error fetching the transaction data!", error);
+          });
+      }, [ transaksiPerPage]);
 
     // Get current transactions to display
     const currentTransactions = allTransaksi.slice(
@@ -168,7 +214,7 @@ const DashboardLS = () => {
 
                                     <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" className='bg-[#f4fef1] p-2 rounded-full' viewBox="0 0 24 24" fill="#45c517"><path d="M5.00488 9.00281C5.55717 9.00281 6.00488 9.45052 6.00488 10.0028C7.63965 10.0028 9.14352 10.5632 10.3349 11.5023L12.5049 11.5028C13.8375 11.5028 15.0348 12.0821 15.8588 13.0025L19.0049 13.0028C20.9972 13.0028 22.7173 14.1681 23.521 15.8542C21.1562 18.9748 17.3268 21.0028 13.0049 21.0028C10.2142 21.0028 7.85466 20.3996 5.944 19.3449C5.80557 19.7284 5.43727 20.0028 5.00488 20.0028H2.00488C1.4526 20.0028 1.00488 19.5551 1.00488 19.0028V10.0028C1.00488 9.45052 1.4526 9.00281 2.00488 9.00281H5.00488ZM6.00589 12.0028L6.00488 17.0248L6.05024 17.0573C7.84406 18.3177 10.183 19.0028 13.0049 19.0028C16.0089 19.0028 18.8035 17.8472 20.84 15.8734L20.9729 15.7398L20.8537 15.6394C20.3897 15.2764 19.8205 15.0512 19.2099 15.0097L19.0049 15.0028L16.8934 15.0028C16.9664 15.3244 17.0049 15.6591 17.0049 16.0028V17.0028H8.00488V15.0028L14.7949 15.0018L14.7605 14.9233C14.38 14.1297 13.593 13.5681 12.6693 13.5081L12.5049 13.5028L9.57547 13.5027C8.66823 12.5773 7.40412 12.0031 6.00589 12.0028ZM4.00488 11.0028H3.00488V18.0028H4.00488V11.0028ZM18.0049 5.00281C19.6617 5.00281 21.0049 6.34595 21.0049 8.00281C21.0049 9.65966 19.6617 11.0028 18.0049 11.0028C16.348 11.0028 15.0049 9.65966 15.0049 8.00281C15.0049 6.34595 16.348 5.00281 18.0049 5.00281ZM18.0049 7.00281C17.4526 7.00281 17.0049 7.45052 17.0049 8.00281C17.0049 8.55509 17.4526 9.00281 18.0049 9.00281C18.5572 9.00281 19.0049 8.55509 19.0049 8.00281C19.0049 7.45052 18.5572 7.00281 18.0049 7.00281ZM11.0049 2.00281C12.6617 2.00281 14.0049 3.34595 14.0049 5.00281C14.0049 6.65966 12.6617 8.00281 11.0049 8.00281C9.34803 8.00281 8.00488 6.65966 8.00488 5.00281C8.00488 3.34595 9.34803 2.00281 11.0049 2.00281ZM11.0049 4.00281C10.4526 4.00281 10.0049 4.45052 10.0049 5.00281C10.0049 5.55509 10.4526 6.00281 11.0049 6.00281C11.5572 6.00281 12.0049 5.55509 12.0049 5.00281C12.0049 4.45052 11.5572 4.00281 11.0049 4.00281Z"></path></svg>
 
-                                    <h1 className='my-5 font-semibold text-[#45c517] text-3xl'>5</h1>
+                                    <h1 className='my-5 font-semibold text-[#45c517] text-3xl'>{total.totalPenggalanganActive || 0}</h1>
                                     <h1 className='my-5 font-semibold text-xl'>Active Campaign</h1>
                                 </motion.div>
                                 <motion.div
@@ -177,7 +223,7 @@ const DashboardLS = () => {
                                     whileTap={{ scale: 0.98 }}
                                     className='p-3 h-48 max-w-1/2 bg-white shadow-md rounded-xl'>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" className='bg-[#f4fef1] p-2 rounded-full' viewBox="0 0 24 24" fill="#45c517"><path d="M18.0049 6.99979H21.0049C21.5572 6.99979 22.0049 7.4475 22.0049 7.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H18.0049V6.99979ZM4.00488 8.99979V18.9998H20.0049V8.99979H4.00488ZM4.00488 4.99979V6.99979H16.0049V4.99979H4.00488ZM15.0049 12.9998H18.0049V14.9998H15.0049V12.9998Z"></path></svg>
-                                    <h1 className='my-5 font-semibold text-[#45c517] text-3xl'>5</h1>
+                                    <h1 className='my-5 font-semibold text-[#45c517] text-3xl'>{total.totalPenggalangan || 0}</h1>
                                     <h1 className='my-5 font-semibold text-xl'>Total Campaign</h1>
                                 </motion.div>
 
@@ -195,8 +241,8 @@ const DashboardLS = () => {
                                     </div>
 
                                     <div className='mt-12 p-0'>
-                                        <p className='text-sm  text-gray-500'>s.d 30 November 2024</p>
-                                        <h1 className='font-semibold text-2xl text-[#45c517]'>Rp5.600.000</h1>
+                                        <p className='text-sm  text-gray-500'>s.d {moment(totalHarga.currentDate).format('D MMMM YYYY')}</p>
+                                        <h1 className='font-semibold text-2xl text-[#45c517]'>Rp.{totalHarga.totalHargaActive?.toLocaleString("id-ID") || 0}</h1>
                                     </div>
                                 </motion.div>
                                 <motion.div
@@ -211,8 +257,8 @@ const DashboardLS = () => {
 
                                     </div>
                                     <div className='mt-12 p-0'>
-                                        <p className='text-sm  text-gray-500'>s.d 30 November 2024</p>
-                                        <h1 className='font-semibold text-2xl text-[#45c517]'>Rp5.600.000</h1>
+                                        <p className='text-sm  text-gray-500'>s.d {moment(totalHarga.currentDate).format('D MMMM YYYY')}</p>
+                                        <h1 className='font-semibold text-2xl text-[#45c517]'>Rp.{totalHarga.totalHargaAllTime?.toLocaleString("id-ID") || 0}</h1>
                                     </div>
                                 </motion.div>
 
@@ -261,8 +307,7 @@ const DashboardLS = () => {
                                             <tr>
                                                 <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">ID</th>
                                                 <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Campaign</th>
-                                                <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Donatur</th>
-                                                <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Harga</th>
+                                                <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Donatur</th>                                                
                                                 <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Total</th>
                                                 <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700">Tanggal</th>
 
@@ -272,12 +317,11 @@ const DashboardLS = () => {
                                         <tbody className="divide-y divide-gray-200">
                                             {currentTransactions.map((transaksi, index) => (
                                                 <tr key={`${transaksi.id}-${index}`} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="py-4 px-6 text-sm text-gray-600">{transaksi.id}</td>
-                                                    <td className="py-4 px-6 text-sm text-gray-600">{transaksi.campaign_name}</td>
-                                                    <td className="py-4 px-6 text-sm text-gray-600">{transaksi.user?.name || '-'}</td>
-                                                    <td className="py-4 px-6 text-sm text-gray-600">Rp {transaksi.price.toLocaleString()}</td>
-                                                    <td className="py-4 px-6 text-sm font-medium text-gray-700">Rp {transaksi.total.toLocaleString()}</td>
-                                                    <td className="py-4 px-6 text-sm text-gray-600">{new Date(transaksi.date).toLocaleDateString()}</td>
+                                                    <td className="py-4 px-6 text-sm text-gray-600">{transaksi.nomor_invoice}</td>
+                                                    <td className="py-4 px-6 text-sm text-gray-600">{transaksi.penggalangan.namaGalangDana}</td>
+                                                    <td className="py-4 px-6 text-sm text-gray-600">{transaksi.user?.nama_user || '-'}</td>
+                                                    <td className="py-4 px-6 text-sm text-gray-600">Rp {transaksi.jumlah_penggalangan.toLocaleString("id-ID")}</td>                                                    
+                                                    <td className="py-4 px-6 text-sm text-gray-600">{new Date(transaksi.createdAt).toLocaleDateString("id-ID")}</td>
 
                                                     <td className="py-4 px-6">
                                                         <button
@@ -366,12 +410,12 @@ const TransaksiPopup = ({ transaksi, isOpen, onClose }) => {
                     </div>
                     <div className="p-6 space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                            <InfoItem label="ID Transaksi" value={transaksi.id} />
-                            <InfoItem label="Campaign" value={transaksi.campaign_name} />
-                            <InfoItem label="Donatur" value={transaksi.user?.name || '-'} />
-                            <InfoItem label="No. Telepon" value={transaksi.user?.phone_number || '-'} />
-                            <InfoItem label="Nominal" value={`Rp ${transaksi.total.toLocaleString()}`} />
-                            <InfoItem label="Tanggal" value={new Date(transaksi.date).toLocaleDateString()} />
+                            <InfoItem label="ID Transaksi" value={transaksi.nomor_invoice} />
+                            <InfoItem label="Campaign" value={transaksi.penggalangan.namaGalangDana} />
+                            <InfoItem label="Donatur" value={transaksi.user?.nama_user || '-'} />
+                            <InfoItem label="No. Telepon" value={transaksi.user?.no_telp_user || '-'} />
+                            <InfoItem label="Nominal" value={`Rp ${transaksi.jumlah_penggalangan.toLocaleString("id-ID")}`} />
+                            <InfoItem label="Tanggal" value={new Date(transaksi.createdAt).toLocaleDateString("id-ID")} />
                         </div>
                     </div>
                     <div className="bg-gray-50 px-6 py-4 flex justify-end">
